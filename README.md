@@ -13,4 +13,6 @@ Doble clic en `INSTALAR_SERVIDOR.bat` para dejarla al arranque.
 
 ## Streamlit Community Cloud
 
-Entrypoint: `app.py`. Repositorio público en GitHub, listo para desplegar.
+Repositorio: [github.com/CynarJulep/compresor](https://github.com/CynarJulep/compresor)
+
+[Desplegar en Streamlit](https://share.streamlit.io/deploy?repository=CynarJulep/compresor&branch=master&mainModule=app.py)

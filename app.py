@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 import html
@@ -169,11 +170,9 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
   font-family: "Outfit", sans-serif;
 }
 
-.file-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 4px 0 10px 0;
+.file-row [data-testid="stHorizontalBlock"] {
+  gap: 8px;
+  align-items: center;
 }
 
 .file-chip {
@@ -398,6 +397,13 @@ div.stButton > button[kind="secondary"] {
 )
 
 
+@dataclass
+class HeldFile:
+    name: str
+    size: int
+    data: bytes
+
+
 def as_file_list(value) -> list:
     if value is None:
         return []
@@ -406,10 +412,52 @@ def as_file_list(value) -> list:
     return [value]
 
 
-def batch_id(files) -> str | None:
-    if not files:
-        return None
-    return "|".join(f"{f.name}:{f.size}" for f in files)
+def ingest_uploads(uploaded) -> bool:
+    """Suma archivos nuevos al lote. Devuelve True si cambió."""
+    managed: list[HeldFile] = list(st.session_state.get("managed") or [])
+    seen = {(f.name, f.size) for f in managed}
+    changed = False
+    overflow = False
+    for f in as_file_list(uploaded):
+        key = (f.name, f.size)
+        if key in seen:
+            continue
+        if len(managed) >= MAX_FILES:
+            overflow = True
+            break
+        managed.append(HeldFile(name=f.name, size=f.size, data=f.getvalue()))
+        seen.add(key)
+        changed = True
+    st.session_state.managed = managed
+    st.session_state.too_many = overflow
+    return changed
+
+
+def bump_uploader() -> None:
+    st.session_state.uploader_rev = int(st.session_state.get("uploader_rev") or 0) + 1
+
+
+def reset_result() -> None:
+    st.session_state.compress_result = None
+    st.session_state.compress_error = None
+    st.session_state.processing = False
+
+
+def remove_file(index: int) -> None:
+    managed = list(st.session_state.get("managed") or [])
+    if 0 <= index < len(managed):
+        managed.pop(index)
+    st.session_state.managed = managed
+    st.session_state.too_many = False
+    bump_uploader()
+    reset_result()
+
+
+def clear_all_files() -> None:
+    st.session_state.managed = []
+    st.session_state.too_many = False
+    bump_uploader()
+    reset_result()
 
 
 def step_copy(step: int, n_files: int) -> tuple[str, str, str]:
@@ -491,32 +539,40 @@ def file_icon(name: str) -> str:
     return ICON_FILE
 
 
-def render_file_chips(files) -> None:
-    chips = "".join(
-        '<div class="file-chip">'
-        f'<span class="icon">{file_icon(f.name)}</span>'
-        '<span class="body">'
-        f'<span class="name">{html.escape(short_name(f.name))}</span>'
-        f'<span class="meta">{format_size(f.size)}</span>'
-        "</span></div>"
-        for f in files[:MAX_FILES]
-    )
-    st.html(
-        "<style>"
-        ".file-list{display:flex;flex-direction:column;gap:10px;margin:4px 0 10px}"
-        ".file-chip{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;"
-        "padding:10px 12px;background:#fff;border:1px solid #D5DEE8;border-radius:8px;"
-        "font-family:Outfit,Helvetica Neue,sans-serif}"
-        ".file-chip .icon{flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;"
-        "justify-content:center;border-radius:6px;background:#F0F4F8;color:#1A4A6E}"
-        ".file-chip .icon svg{display:block;width:18px;height:18px}"
-        ".file-chip .body{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}"
-        ".file-chip .name{color:#0C2644;font-size:.86rem;font-weight:500;overflow:hidden;"
-        "text-overflow:ellipsis;white-space:nowrap}"
-        ".file-chip .meta{color:#5A6B7A;font-size:.75rem}"
-        "</style>"
-        f'<div class="file-list">{chips}</div>'
-    )
+def render_file_rows(files: list[HeldFile], *, allow_remove: bool) -> None:
+    for i, held in enumerate(files[:MAX_FILES]):
+        chip, action = st.columns((1, 0.16), vertical_alignment="center", gap="small")
+        with chip:
+            st.html(
+                "<style>"
+                ".file-chip{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;"
+                "padding:10px 12px;background:#fff;border:1px solid #D5DEE8;border-radius:8px;"
+                "font-family:Outfit,Helvetica Neue,sans-serif}"
+                ".file-chip .icon{flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;"
+                "justify-content:center;border-radius:6px;background:#F0F4F8;color:#1A4A6E}"
+                ".file-chip .icon svg{display:block;width:18px;height:18px}"
+                ".file-chip .body{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}"
+                ".file-chip .name{color:#0C2644;font-size:.86rem;font-weight:500;overflow:hidden;"
+                "text-overflow:ellipsis;white-space:nowrap}"
+                ".file-chip .meta{color:#5A6B7A;font-size:.75rem}"
+                "</style>"
+                '<div class="file-chip">'
+                f'<span class="icon">{file_icon(held.name)}</span>'
+                '<span class="body">'
+                f'<span class="name">{html.escape(short_name(held.name))}</span>'
+                f'<span class="meta">{format_size(held.size)}</span>'
+                "</span></div>"
+            )
+        with action:
+            if allow_remove and st.button(
+                "×",
+                type="secondary",
+                key=f"rm_{i}_{held.size}_{held.name}",
+                help=f"Quitar {held.name}",
+                use_container_width=True,
+            ):
+                remove_file(i)
+                st.rerun()
 
 
 # --- Hero compacto ---
@@ -533,14 +589,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-files = as_file_list(st.session_state.get("upload"))
-current_id = batch_id(files)
-if st.session_state.get("file_id") != current_id:
-    st.session_state.file_id = current_id
-    st.session_state.compress_result = None
-    st.session_state.compress_error = None
-    st.session_state.processing = False
+if "managed" not in st.session_state:
+    st.session_state.managed = []
+if "uploader_rev" not in st.session_state:
+    st.session_state.uploader_rev = 0
 
+files: list[HeldFile] = list(st.session_state.managed)
 has_result = st.session_state.get("compress_result") is not None
 if not files:
     step = 1
@@ -549,7 +603,10 @@ elif has_result:
 else:
     step = 2
 
-if step == 3:
+UPLOAD_TYPES = ["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"]
+show_uploader = step < 3 and len(files) < MAX_FILES
+
+if step == 3 or not show_uploader:
     st.markdown(
         """
         <style>
@@ -565,66 +622,65 @@ if step == 3:
 with st.container(border=True):
     render_step_header(step, len(files))
 
-    # El uploader siempre se monta (para no perder el lote).
-    # En paso 1 ocupa todo el ancho; en 2–3 queda a la izquierda y la acción a la derecha.
-    if step == 1:
-        uploaded = st.file_uploader(
+    def mount_uploader():
+        return st.file_uploader(
             "Elegí archivos",
-            type=["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"],
+            type=UPLOAD_TYPES,
             accept_multiple_files=True,
             label_visibility="collapsed",
-            key="upload",
+            key=f"upload_{st.session_state.uploader_rev}",
         )
-        files = as_file_list(uploaded)
-        current_id = batch_id(files)
-        if st.session_state.get("file_id") != current_id:
-            st.session_state.file_id = current_id
-            st.session_state.compress_result = None
-            st.session_state.compress_error = None
-            st.session_state.processing = False
-        too_many = len(files) > MAX_FILES
+
+    go = False
+    result = st.session_state.get("compress_result")
+    too_many = bool(st.session_state.get("too_many"))
+
+    if step == 1:
+        uploaded = mount_uploader()
+        if ingest_uploads(uploaded):
+            st.rerun()
+        files = list(st.session_state.managed)
+        too_many = bool(st.session_state.get("too_many"))
         if too_many:
             ui.alert(
                 "Máximo 5 archivos",
                 description="Quitá algunos para continuar.",
                 variant="destructive",
-                key="too_many",
+                key="too_many_alert",
             )
-        go = False
-        result = None
+        if files:
+            render_file_rows(files, allow_remove=True)
+            if st.button("Quitar todos", type="secondary", key="clear_all_1"):
+                clear_all_files()
+                st.rerun()
     else:
         col_info, col_action = st.columns((1.35, 0.9), gap="medium")
 
         with col_info:
-            uploaded = st.file_uploader(
-                "Elegí archivos",
-                type=["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"],
-                accept_multiple_files=True,
-                label_visibility="collapsed",
-                key="upload",
-            )
-            files = as_file_list(uploaded)
+            if show_uploader:
+                uploaded = mount_uploader()
+                if ingest_uploads(uploaded):
+                    reset_result()
+                    st.rerun()
+                files = list(st.session_state.managed)
+                too_many = bool(st.session_state.get("too_many"))
+            else:
+                # Hay que montar el widget con la misma key para no perder el lote.
+                mount_uploader()
 
-            current_id = batch_id(files)
-            if st.session_state.get("file_id") != current_id:
-                st.session_state.file_id = current_id
-                st.session_state.compress_result = None
-                st.session_state.compress_error = None
-                st.session_state.processing = False
-                has_result = False
-                step = 2 if files else 1
-
-            too_many = len(files) > MAX_FILES
             if too_many:
                 ui.alert(
                     "Máximo 5 archivos",
-                    description="Quitá algunos para continuar.",
+                    description="Quitá algunos con la X o Quitar todos.",
                     variant="destructive",
-                    key="too_many",
+                    key="too_many_alert",
                 )
 
             if files:
-                render_file_chips(files)
+                render_file_rows(files, allow_remove=step == 2)
+                if step == 2 and st.button("Quitar todos", type="secondary", key="clear_all_2"):
+                    clear_all_files()
+                    st.rerun()
 
             if st.session_state.get("processing"):
                 n = len(files)
@@ -660,7 +716,6 @@ with st.container(border=True):
                     )
 
         with col_action:
-            go = False
             if step == 2 and files and not too_many and not st.session_state.get("processing"):
                 label = "Comprimir" if len(files) == 1 else "Unir y comprimir"
                 go = st.button(label, type="primary", use_container_width=True)
@@ -679,12 +734,7 @@ with st.container(border=True):
                     use_container_width=True,
                 )
                 if st.button("Empezar de nuevo", use_container_width=True):
-                    st.session_state.compress_result = None
-                    st.session_state.compress_error = None
-                    st.session_state.processing = False
-                    st.session_state.file_id = None
-                    if "upload" in st.session_state:
-                        del st.session_state["upload"]
+                    clear_all_files()
                     st.rerun()
 
     if go:
@@ -695,12 +745,11 @@ with st.container(border=True):
     if st.session_state.get("processing") and files and not too_many:
         items = []
         bad = None
-        for f in files[:MAX_FILES]:
-            name = f.name or "archivo"
-            if not supported_extension(name):
-                bad = f"Formato no soportado: {name}"
+        for held in files[:MAX_FILES]:
+            if not supported_extension(held.name):
+                bad = f"Formato no soportado: {held.name}"
                 break
-            items.append((f.getvalue(), name))
+            items.append((held.data, held.name))
 
         if bad:
             st.session_state.compress_result = None

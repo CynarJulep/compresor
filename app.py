@@ -411,34 +411,30 @@ def render_step_header(step: int, n_files: int) -> None:
         for i in range(1, 4)
     )
     st.markdown(
-        f"""
-        <div id="paso-actual">
-          <div class="wizard-top">
-            <div>
-              <p class="wizard-kicker">{kicker}</p>
-              <p class="wizard-title">{title}</p>
-            </div>
-            <div class="wizard-dots">{dots}</div>
-          </div>
-          <p class="wizard-help">{help_text}</p>
-        </div>
-        """,
+        '<div id="paso-actual">'
+        '<div class="wizard-top"><div>'
+        f'<p class="wizard-kicker">{kicker}</p>'
+        f'<p class="wizard-title">{title}</p>'
+        "</div>"
+        f'<div class="wizard-dots">{dots}</div>'
+        "</div>"
+        f'<p class="wizard-help">{help_text}</p>'
+        "</div>",
         unsafe_allow_html=True,
     )
 
 
 def render_file_chips(files) -> None:
-    rows = []
-    for f in files[:MAX_FILES]:
-        rows.append(
-            f"""
-            <div class="file-chip">
-              <span class="name">{html.escape(f.name)}</span>
-              <span class="meta">{format_size(f.size)}</span>
-            </div>
-            """
-        )
-    st.markdown(f'<div class="file-list">{"".join(rows)}</div>', unsafe_allow_html=True)
+    # HTML compacto: Streamlit Markdown trata los saltos en blanco entre
+    # bloques como código y muestra el HTML crudo del 2º archivo en adelante.
+    chips = "".join(
+        '<div class="file-chip">'
+        f'<span class="name">{html.escape(f.name)}</span>'
+        f'<span class="meta">{format_size(f.size)}</span>'
+        "</div>"
+        for f in files[:MAX_FILES]
+    )
+    st.markdown(f'<div class="file-list">{chips}</div>', unsafe_allow_html=True)
 
 
 # --- Hero compacto ---
@@ -565,13 +561,11 @@ with st.container(border=True):
             if result is not None and step == 3:
                 saved = result.original_size - result.final_size
                 st.markdown(
-                    f"""
-                    <div class="metrics-line">
-                      <span>Original <strong>{format_size(result.original_size)}</strong></span>
-                      <span>Resultado <strong>{format_size(result.final_size)}</strong></span>
-                      <span>Techo <strong>{format_size(TARGET_BYTES)}</strong></span>
-                    </div>
-                    """,
+                    '<div class="metrics-line">'
+                    f"<span>Original <strong>{format_size(result.original_size)}</strong></span>"
+                    f"<span>Resultado <strong>{format_size(result.final_size)}</strong></span>"
+                    f"<span>Techo <strong>{format_size(TARGET_BYTES)}</strong></span>"
+                    "</div>",
                     unsafe_allow_html=True,
                 )
                 if result.already_ok:

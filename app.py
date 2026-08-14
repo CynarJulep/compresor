@@ -95,37 +95,56 @@ h1 {
 }
 
 .welcome p {
-  margin: 0 0 0.75rem 0;
+  margin: 0;
 }
 
-.steps {
-  list-style: none;
-  margin: 1.4rem 0 0 0;
-  padding: 0;
-  max-width: 34rem;
+.wizard {
+  margin: 0 0 18px 0;
+  animation: enter 380ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.steps li {
+.wizard-dots {
   display: flex;
-  gap: 14px;
-  align-items: baseline;
-  padding: 9px 0;
-  border-top: 1px solid #E2E8F0;
-  color: #2C3D4F;
-  font-size: 0.95rem;
+  gap: 6px;
+  margin: 0 0 14px 0;
+}
+
+.wizard-dots span {
+  display: block;
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: #D5DEE8;
+}
+
+.wizard-dots span.done,
+.wizard-dots span.current {
+  background: #1A4A6E;
+}
+
+.wizard-kicker {
+  margin: 0 0 4px 0;
+  color: #1A4A6E;
+  font-size: 0.75rem;
+  font-weight: 500;
   font-family: "Outfit", sans-serif;
 }
 
-.steps li:last-child {
-  border-bottom: 1px solid #E2E8F0;
+.wizard-title {
+  margin: 0 0 6px 0;
+  color: #0C2644;
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-family: "Outfit", sans-serif;
+  letter-spacing: -0.02em;
 }
 
-.steps span {
-  color: #1A4A6E;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.78rem;
-  font-weight: 600;
-  min-width: 1.6rem;
+.wizard-help {
+  margin: 0;
+  color: #5A6B7A;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  font-family: "Outfit", sans-serif;
 }
 
 .file-ready {
@@ -207,13 +226,6 @@ h1 {
   border-color: #1A4A6E !important;
 }
 
-.hint {
-  margin: 8px 0 14px 0;
-  color: #5A6B7A;
-  font-size: 0.8rem;
-  font-family: "Outfit", sans-serif;
-}
-
 div.stButton > button,
 div.stDownloadButton > button,
 [data-testid="stBaseButton-primary"],
@@ -293,12 +305,50 @@ div.stDownloadButton > button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .block-container, .file-ready, .result-block { animation: none; }
+  .block-container, .file-ready, .result-block, .wizard { animation: none; }
 }
 </style>
 """,
     unsafe_allow_html=True,
 )
+
+WIZARD = {
+    1: (
+        "Paso 1 de 3",
+        "Subí el archivo",
+        "Arrastralo o hacé clic. Hasta 80 MB.",
+    ),
+    2: (
+        "Paso 2 de 3",
+        "Comprimí",
+        "El archivo está cargado. Tocá Comprimir para dejarlo bajo 1 MB.",
+    ),
+    3: (
+        "Paso 3 de 3",
+        "Descargá",
+        "Listo. Descargá el archivo para el trámite.",
+    ),
+}
+
+
+def render_wizard(step: int) -> None:
+    kicker, title, help_text = WIZARD[step]
+    dots = "".join(
+        f'<span class="{"done" if i < step else "current" if i == step else "todo"}"></span>'
+        for i in range(1, 4)
+    )
+    st.markdown(
+        f"""
+        <div class="wizard">
+          <div class="wizard-dots">{dots}</div>
+          <p class="wizard-kicker">{kicker}</p>
+          <p class="wizard-title">{title}</p>
+          <p class="wizard-help">{help_text}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 left, right = st.columns((1.15, 0.85), gap="large")
 
@@ -314,41 +364,49 @@ with left:
             no sale de los servidores.
           </p>
         </div>
-        <ol class="steps">
-          <li><span>01</span> Subí el archivo</li>
-          <li><span>02</span> Comprimí</li>
-          <li><span>03</span> Descargá</li>
-        </ol>
         """,
         unsafe_allow_html=True,
     )
 
 with right:
-    uploaded = st.file_uploader(
-        "Elegí un archivo",
-        type=["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"],
-        label_visibility="visible",
-    )
-    st.markdown('<p class="hint">Hasta 80 MB</p>', unsafe_allow_html=True)
-
-    file_id = f"{uploaded.name}-{uploaded.size}" if uploaded is not None else None
+    pending = st.session_state.get("upload")
+    file_id = f"{pending.name}-{pending.size}" if pending is not None else None
     if st.session_state.get("file_id") != file_id:
         st.session_state.file_id = file_id
         st.session_state.compress_result = None
         st.session_state.compress_error = None
 
-    if uploaded is not None:
+    has_result = st.session_state.get("compress_result") is not None
+    if pending is None:
+        step = 1
+    elif not has_result:
+        step = 2
+    else:
+        step = 3
+
+    render_wizard(step)
+
+    uploaded = st.file_uploader(
+        "Elegí un archivo",
+        type=["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"],
+        label_visibility="collapsed",
+        key="upload",
+    )
+
+    if uploaded is not None and step == 2:
         st.markdown(
             f"""
             <div class="file-ready">
               <div class="name">{html.escape(uploaded.name)}</div>
-              <div class="meta">Listo para comprimir · {format_size(uploaded.size)}</div>
+              <div class="meta">{format_size(uploaded.size)}</div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-    go = st.button("Comprimir", type="primary", disabled=uploaded is None)
+    go = False
+    if step == 2:
+        go = st.button("Comprimir", type="primary")
 
     if go and uploaded is not None:
         raw = uploaded.getvalue()
@@ -362,6 +420,7 @@ with right:
                     st.session_state.compress_result = compress_file(raw, name)
                     st.session_state.compress_error = None
                     status.update(label="Listo", state="complete")
+                st.rerun()
             except ValueError as exc:
                 st.session_state.compress_result = None
                 st.session_state.compress_error = str(exc)

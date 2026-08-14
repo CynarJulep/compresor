@@ -6,7 +6,6 @@ import streamlit as st
 import streamlit_shadcn_ui as ui
 
 from compressor import (
-    MAX_INPUT_BYTES,
     TARGET_BYTES,
     compress_file,
     format_size,
@@ -29,13 +28,10 @@ st.markdown(
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
 
-html, body, [class*="st-"], .stApp, p, label, span, div {
-  font-family: "Outfit", "Helvetica Neue", sans-serif;
-}
-
 .stApp {
   background: #F4F6F8;
   color: #0C1929;
+  font-family: "Outfit", "Helvetica Neue", sans-serif;
 }
 
 .stApp::before {
@@ -64,11 +60,11 @@ footer,
   max-width: 1080px;
   padding-top: 56px;
   padding-bottom: 40px;
-  animation: enter 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: enter 480ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes enter {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: none; }
 }
 
@@ -79,46 +75,45 @@ h1 {
   line-height: 1.12 !important;
   letter-spacing: -0.03em !important;
   color: #0C2644 !important;
-  margin: 0 0 1rem 0 !important;
+  margin: 0 0 0.85rem 0 !important;
 }
 
 .kicker {
-  margin: 0 0 0.55rem 0;
+  margin: 0 0 0.5rem 0;
   color: #1A4A6E;
   font-size: 0.82rem;
   font-weight: 500;
+  font-family: "Outfit", sans-serif;
 }
 
 .welcome {
   color: #2C3D4F;
   font-size: 1rem;
-  line-height: 1.65;
-  max-width: 36rem;
+  line-height: 1.6;
+  max-width: 34rem;
+  font-family: "Outfit", sans-serif;
 }
 
 .welcome p {
-  margin: 0 0 0.9rem 0;
-}
-
-.welcome p:last-child {
-  margin-bottom: 0;
+  margin: 0 0 0.75rem 0;
 }
 
 .steps {
   list-style: none;
-  margin: 1.6rem 0 0 0;
+  margin: 1.4rem 0 0 0;
   padding: 0;
-  max-width: 36rem;
+  max-width: 34rem;
 }
 
 .steps li {
   display: flex;
   gap: 14px;
   align-items: baseline;
-  padding: 10px 0;
+  padding: 9px 0;
   border-top: 1px solid #E2E8F0;
   color: #2C3D4F;
   font-size: 0.95rem;
+  font-family: "Outfit", sans-serif;
 }
 
 .steps li:last-child {
@@ -133,21 +128,15 @@ h1 {
   min-width: 1.6rem;
 }
 
-.panel-label {
-  margin: 0 0 10px 0;
-  color: #1A4A6E;
-  font-size: 0.82rem;
-  font-weight: 500;
-}
-
 .file-ready {
-  margin: 0 0 12px 0;
+  margin: 12px 0;
   padding: 12px 14px;
   background: #FFFFFF;
   border: 1px solid #C5D4E3;
   border-left: 3px solid #1A4A6E;
   border-radius: 8px;
-  animation: enter 380ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: enter 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: "Outfit", sans-serif;
 }
 
 .file-ready .name {
@@ -164,117 +153,108 @@ h1 {
 
 .result-block {
   margin-top: 8px;
-  animation: enter 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: enter 380ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-testid="stFileUploader"] {
-  margin-top: 0;
+[data-testid="stIconMaterial"] {
+  font-family: "Material Symbols Rounded", "Material Symbols Outlined" !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
 }
 
-[data-testid="stFileUploader"] > label {
-  display: none;
+[data-testid="stWidgetLabel"] p {
+  font-family: "Outfit", sans-serif !important;
+  color: #0C2644 !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
 }
 
+[data-testid="stFileUploader"] section,
 [data-testid="stFileUploaderDropzone"] {
-  min-height: 200px !important;
   background: #FFFFFF !important;
   border: 1px solid #D5DEE8 !important;
   border-radius: 8px !important;
-  padding: 28px 20px !important;
-  transition: border-color 200ms ease, background 200ms ease, transform 200ms ease;
+}
+
+[data-testid="stFileUploaderDropzone"] {
+  position: relative !important;
+  min-height: 96px !important;
+  cursor: pointer;
+}
+
+[data-testid="stFileUploaderDropzone"] > * {
+  opacity: 0 !important;
+}
+
+[data-testid="stFileUploaderDropzone"]::after {
+  content: "Arrastrá un archivo o hacé clic para elegir";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  color: #1A4A6E;
+  font-family: "Outfit", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  pointer-events: none;
 }
 
 [data-testid="stFileUploaderDropzone"]:hover {
   border-color: #1A4A6E !important;
-  background: #F8FAFC !important;
 }
 
-[data-testid="stFileUploader"]:has([data-testid="stFileUploaderFile"]) [data-testid="stFileUploaderDropzone"],
-[data-testid="stFileUploader"]:has([data-testid="stFileUploaderFileName"]) [data-testid="stFileUploaderDropzone"] {
-  border-color: #1A4A6E !important;
-  background: #F3F6FA !important;
+.hint {
+  margin: 8px 0 14px 0;
+  color: #5A6B7A;
+  font-size: 0.8rem;
+  font-family: "Outfit", sans-serif;
 }
 
-[data-testid="stFileUploaderDropzone"] button {
+div.stButton > button,
+div.stDownloadButton > button,
+[data-testid="stBaseButton-primary"],
+[data-testid="baseButton-primary"] {
   background: #1A4A6E !important;
   color: #FFFFFF !important;
   border: 1px solid #1A4A6E !important;
   border-radius: 6px !important;
   font-family: "Outfit", sans-serif !important;
   font-weight: 500 !important;
-  padding: 0.55rem 1.15rem !important;
   box-shadow: none !important;
-  transition: background 200ms ease, border-color 200ms ease, transform 160ms ease !important;
+  min-height: 2.6rem;
+  transition: background 180ms ease, border-color 180ms ease, transform 140ms ease;
 }
 
-[data-testid="stFileUploaderDropzone"] button:hover {
+div.stButton > button:hover,
+div.stDownloadButton > button:hover,
+[data-testid="stBaseButton-primary"]:hover,
+[data-testid="baseButton-primary"]:hover {
   background: #0C2644 !important;
   border-color: #0C2644 !important;
   color: #FFFFFF !important;
 }
 
-[data-testid="stFileUploaderDropzone"] button:active {
-  transform: scale(0.98) !important;
+div.stButton > button:disabled,
+[data-testid="stBaseButton-primary"]:disabled,
+[data-testid="baseButton-primary"]:disabled {
+  background: #1A4A6E !important;
+  border-color: #1A4A6E !important;
+  color: #FFFFFF !important;
+  opacity: 0.45;
 }
 
-[data-testid="stFileUploaderDropzoneInstructions"] span,
-[data-testid="stFileUploaderDropzoneInstructions"] small {
-  color: #5A6B7A !important;
-  font-size: 0.92rem !important;
-}
-
-.stButton > button {
-  background: #1A4A6E;
-  color: #FFFFFF;
-  border: 1px solid #1A4A6E;
-  border-radius: 6px;
-  font-family: "Outfit", sans-serif;
-  font-weight: 500;
-  padding: 0.55rem 1.2rem;
-  box-shadow: none;
+div.stDownloadButton > button {
   width: 100%;
-  transition: background 200ms ease, border-color 200ms ease, transform 160ms ease;
-}
-
-.stButton > button:hover {
-  background: #0C2644;
-  border-color: #0C2644;
-  color: #FFFFFF;
-}
-
-.stButton > button:active {
-  transform: scale(0.98);
-}
-
-.stDownloadButton > button {
-  background: #FFFFFF;
-  color: #1A4A6E;
-  border: 1px solid #C5D4E3;
-  border-radius: 6px;
-  font-weight: 500;
-  box-shadow: none;
-  transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
-}
-
-.stDownloadButton > button:hover {
-  background: #F3F6FA;
-  border-color: #1A4A6E;
-  color: #0C2644;
 }
 
 [data-testid="stStatus"] {
   border: 1px solid #C5D4E3 !important;
   border-radius: 8px !important;
   background: #FFFFFF !important;
-  animation: enter 360ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-testid="stSpinner"] {
-  color: #1A4A6E;
-}
-
-.stSpinner > div > div {
-  border-top-color: #1A4A6E !important;
 }
 
 [data-testid="stImage"] {
@@ -294,38 +274,26 @@ h1 {
   font-size: 0.75rem;
   line-height: 1.65;
   max-width: 42rem;
+  font-family: "Outfit", sans-serif;
 }
 
-.legal strong {
-  color: #5A6B7A;
-  font-weight: 500;
+.copy, .renzo {
+  font-family: "Outfit", sans-serif;
+  font-size: 0.72rem;
 }
 
 .copy {
   margin-top: 14px;
   color: #9AA5B1;
-  font-size: 0.72rem;
 }
 
 .renzo {
   margin-top: 4px;
   color: #8A96A3;
-  font-size: 0.72rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .block-container,
-  .file-ready,
-  .result-block,
-  [data-testid="stStatus"] {
-    animation: none;
-  }
-  [data-testid="stFileUploaderDropzone"],
-  .stButton > button,
-  .stDownloadButton > button,
-  [data-testid="stFileUploaderDropzone"] button {
-    transition: none !important;
-  }
+  .block-container, .file-ready, .result-block { animation: none; }
 }
 </style>
 """,
@@ -341,26 +309,15 @@ with left:
         """
         <div class="welcome">
           <p>
-            Bienvenido al Compresor de archivos de Atención Ciudadana de la
-            Municipalidad de Santa Fe. Nuestros bots toman tu archivo, lo
-            comprimen y te lo dejan listo para que pese lo menos posible — por
-            debajo de 1&nbsp;MB — y pueda ser procesado por los sistemas de
-            Atención Ciudadana.
-          </p>
-          <p>
-            Todo corre en la red interna: los archivos nunca abandonan los
-            servidores de Atención Ciudadana. No se envían a internet ni a
-            servicios externos, de modo que quedan seguros y protegidos.
-          </p>
-          <p>
-            Subí un PDF, JPG, PNG u otro formato admitido. Cuando termine la
-            compresión, descargá el resultado e incorporalo al trámite.
+            Los bots comprimen tu archivo a menos de 1&nbsp;MB para los trámites
+            de Atención Ciudadana. El proceso corre en la red interna: el archivo
+            no sale de los servidores.
           </p>
         </div>
         <ol class="steps">
           <li><span>01</span> Subí el archivo</li>
-          <li><span>02</span> Comprimí a menos de 1 MB</li>
-          <li><span>03</span> Descargá e incorporá al trámite</li>
+          <li><span>02</span> Comprimí</li>
+          <li><span>03</span> Descargá</li>
         </ol>
         """,
         unsafe_allow_html=True,
@@ -368,11 +325,11 @@ with left:
 
 with right:
     uploaded = st.file_uploader(
-        "Subí un archivo",
+        "Elegí un archivo",
         type=["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"],
-        label_visibility="collapsed",
-        help=f"PDF o imagen. Máximo {format_size(MAX_INPUT_BYTES)}.",
+        label_visibility="visible",
     )
+    st.markdown('<p class="hint">Hasta 80 MB</p>', unsafe_allow_html=True)
 
     file_id = f"{uploaded.name}-{uploaded.size}" if uploaded is not None else None
     if st.session_state.get("file_id") != file_id:
@@ -380,12 +337,7 @@ with right:
         st.session_state.compress_result = None
         st.session_state.compress_error = None
 
-    if uploaded is None:
-        st.markdown(
-            '<p class="panel-label">Esperando un archivo</p>',
-            unsafe_allow_html=True,
-        )
-    else:
+    if uploaded is not None:
         st.markdown(
             f"""
             <div class="file-ready">
@@ -406,12 +358,10 @@ with right:
             st.session_state.compress_error = "Ese formato no se puede comprimir acá."
         else:
             try:
-                with st.status("Comprimiendo el archivo…", expanded=True) as status:
-                    st.write("Tomando el archivo")
-                    st.write("Reduciendo el peso")
+                with st.status("Comprimiendo…", expanded=False) as status:
                     st.session_state.compress_result = compress_file(raw, name)
                     st.session_state.compress_error = None
-                    status.update(label="Compresión terminada", state="complete")
+                    status.update(label="Listo", state="complete")
             except ValueError as exc:
                 st.session_state.compress_result = None
                 st.session_state.compress_error = str(exc)
@@ -468,19 +418,16 @@ with right:
             data=result.data,
             file_name=result.filename,
             mime=mime,
-            type="secondary",
+            type="primary",
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown(
     """
     <div class="legal">
-      Compresor de archivos de <strong>Atención Ciudadana</strong>.
-      El uso de esta herramienta implica la aceptación de que los archivos se
-      procesan de forma temporal, sin almacenamiento persistente, y que la
-      calidad visual puede reducirse para respetar el límite de 1&nbsp;MB.
-      Queda prohibida la reproducción o redistribución de esta aplicación
-      sin autorización.
+      Compresor de <strong>Atención Ciudadana</strong>. Los archivos se procesan
+      de forma temporal, sin almacenamiento persistente. La calidad visual puede
+      reducirse para respetar el límite de 1&nbsp;MB.
     </div>
     <p class="copy">© 2026 Atención Ciudadana de la Municipalidad de Santa Fe. Todos los derechos reservados.</p>
     <p class="renzo">Desarrollado y mantenido por Renzo.</p>

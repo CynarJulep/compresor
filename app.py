@@ -103,7 +103,7 @@ h1, .hero-title {
   color: #2C3D4F;
   font-size: 0.95rem;
   line-height: 1.55;
-  max-width: 22rem;
+  max-width: 24rem;
   font-family: "Outfit", sans-serif;
 }
 
@@ -466,7 +466,11 @@ with left:
     st.markdown(
         """
         <div class="welcome">
-          <p>Dejá el archivo bajo 1&nbsp;MB. Se procesa en la red interna.</p>
+          <p>
+            Subí hasta 5 archivos, comprimilos y descargá el resultado
+            para el trámite. Todo corre en la red interna: el archivo no
+            sale de los servidores ni se guarda.
+          </p>
         </div>
         """,
         unsafe_allow_html=True,

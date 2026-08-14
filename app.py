@@ -9,7 +9,6 @@ import streamlit_shadcn_ui as ui
 from compressor import (
     IMAGE_EXTS,
     MAX_FILES,
-    PDF_EXTS,
     TARGET_BYTES,
     compress_uploads,
     format_size,
@@ -19,6 +18,7 @@ from compressor import (
 ROOT = Path(__file__).resolve().parent
 LOGO = ROOT / "assets" / "brand" / "msf-horizontal.png"
 ICON = ROOT / "assets" / "brand" / "msf-icon.png"
+ICONS_DIR = ROOT / "assets" / "icons"
 
 st.set_page_config(
     page_title="Compresor de archivos — Atención Ciudadana",
@@ -201,12 +201,6 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
   color: #1A4A6E;
 }
 
-.file-chip .icon svg {
-  display: block;
-  width: 18px;
-  height: 18px;
-}
-
 .file-chip .body {
   min-width: 0;
   flex: 1;
@@ -385,6 +379,16 @@ div.stButton > button[kind="secondary"] {
 [data-testid="stImage"] { margin-top: 10px; }
 [data-testid="stImage"] img { max-height: 32px; width: auto; }
 
+[data-testid="stHorizontalBlock"]:has(.file-chip) [data-testid="column"]:first-child [data-testid="stImage"] {
+  margin: 0 !important;
+}
+[data-testid="stHorizontalBlock"]:has(.file-chip) [data-testid="column"]:first-child [data-testid="stImage"] img {
+  max-height: 36px !important;
+  width: 36px !important;
+  height: 36px !important;
+  object-fit: contain;
+}
+
 .legal {
   margin-top: 28px;
   padding-top: 12px;
@@ -518,30 +522,6 @@ def render_step_header(step: int, n_files: int) -> None:
     )
 
 
-ICON_PDF = (
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-    'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M7 3.5h7l5 5V20a1.5 1.5 0 0 1-1.5 1.5h-10.5A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5z"/>'
-    '<path d="M14 3.5V9h5.5"/><path d="M8.5 14h7M8.5 17.5h4.5"/>'
-    "</svg>"
-)
-ICON_IMAGE = (
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-    'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<rect x="4" y="5" width="16" height="14" rx="2"/>'
-    '<circle cx="9" cy="10" r="1.4"/>'
-    '<path d="M7 17l4.2-4.2a1 1 0 0 1 1.4 0L20 16.2"/>'
-    "</svg>"
-)
-ICON_FILE = (
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-    'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M7 3.5h7l5 5V20a1.5 1.5 0 0 1-1.5 1.5h-10.5A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5z"/>'
-    '<path d="M14 3.5V9h5.5"/>'
-    "</svg>"
-)
-
-
 def short_name(name: str, max_len: int = 42) -> str:
     if len(name) <= max_len:
         return name
@@ -550,35 +530,32 @@ def short_name(name: str, max_len: int = 42) -> str:
     return f"{name[:keep]}…{ext}"
 
 
-def file_icon(name: str) -> str:
+def icon_path(name: str) -> Path:
     ext = Path(name).suffix.lower()
-    if ext in PDF_EXTS:
-        return ICON_PDF
     if ext in IMAGE_EXTS:
-        return ICON_IMAGE
-    return ICON_FILE
+        return ICONS_DIR / "image.png"
+    return ICONS_DIR / "document.png"
 
 
 def render_file_rows(files: list[HeldFile], *, allow_remove: bool) -> None:
     for i, held in enumerate(files[:MAX_FILES]):
-        chip, action = st.columns((1, 0.16), vertical_alignment="center", gap="small")
+        ico, chip, action = st.columns((0.14, 1, 0.16), vertical_alignment="center", gap="small")
+        with ico:
+            glyph = icon_path(held.name)
+            if glyph.exists():
+                st.image(glyph, width=36)
         with chip:
             st.html(
                 "<style>"
-                ".file-chip{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;"
+                ".file-chip{display:flex;align-items:center;width:100%;box-sizing:border-box;"
                 "padding:10px 12px;background:#fff;border:1px solid #D5DEE8;border-radius:8px;"
                 "font-family:Outfit,Helvetica Neue,sans-serif}"
-                ".file-chip .icon{flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;"
-                "justify-content:center;border-radius:6px;background:#F0F4F8;color:#1A4A6E}"
-                ".file-chip .icon svg{display:block;width:18px;height:18px}"
                 ".file-chip .body{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}"
                 ".file-chip .name{color:#0C2644;font-size:.86rem;font-weight:500;overflow:hidden;"
                 "text-overflow:ellipsis;white-space:nowrap}"
                 ".file-chip .meta{color:#5A6B7A;font-size:.75rem}"
                 "</style>"
-                '<div class="file-chip">'
-                f'<span class="icon">{file_icon(held.name)}</span>'
-                '<span class="body">'
+                '<div class="file-chip"><span class="body">'
                 f'<span class="name">{html.escape(short_name(held.name))}</span>'
                 f'<span class="meta">{format_size(held.size)}</span>'
                 "</span></div>"

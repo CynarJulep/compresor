@@ -317,7 +317,6 @@ section[data-testid="stFileUploader"] > div > ul,
 }
 
 div.stButton > button,
-div.stDownloadButton > button,
 [data-testid="stBaseButton-primary"],
 [data-testid="baseButton-primary"] {
   background: #1A4A6E !important;
@@ -333,11 +332,32 @@ div.stDownloadButton > button,
 }
 
 div.stButton > button:hover,
-div.stDownloadButton > button:hover,
 [data-testid="stBaseButton-primary"]:hover,
 [data-testid="baseButton-primary"]:hover {
   background: #0C2644 !important;
   border-color: #0C2644 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
+div.stDownloadButton > button,
+[data-testid="stDownloadButton"] button {
+  background: #2F6B5C !important;
+  color: #FFFFFF !important;
+  border: 1px solid #2F6B5C !important;
+  border-radius: 6px !important;
+  font-family: "Outfit", sans-serif !important;
+  font-weight: 500 !important;
+  box-shadow: 0 2px 6px rgba(12, 38, 68, 0.10) !important;
+  min-height: 2.75rem;
+  width: 100%;
+  transition: background 160ms ease, border-color 160ms ease, transform 120ms ease;
+}
+
+div.stDownloadButton > button:hover,
+[data-testid="stDownloadButton"] button:hover {
+  background: #245448 !important;
+  border-color: #245448 !important;
   color: #FFFFFF !important;
   transform: translateY(-1px);
 }

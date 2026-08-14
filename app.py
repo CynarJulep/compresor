@@ -6,7 +6,9 @@ import streamlit as st
 import streamlit_shadcn_ui as ui
 
 from compressor import (
+    IMAGE_EXTS,
     MAX_FILES,
+    PDF_EXTS,
     TARGET_BYTES,
     compress_uploads,
     format_size,
@@ -169,39 +171,63 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 
 .file-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 0 8px 0;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 10px 0;
 }
 
 .file-chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  max-width: 100%;
-  padding: 6px 10px;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  border-left: 3px solid #1A4A6E;
-  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  background: #FFFFFF;
+  border: 1px solid #D5DEE8;
+  border-radius: 8px;
   font-family: "Outfit", sans-serif;
   animation: stepIn 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.file-chip .icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #F0F4F8;
+  color: #1A4A6E;
+}
+
+.file-chip .icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.file-chip .body {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .file-chip .name {
   color: #0C2644;
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 14rem;
 }
 
 .file-chip .meta {
   color: #5A6B7A;
-  font-size: 0.72rem;
-  flex-shrink: 0;
+  font-size: 0.75rem;
 }
 
 .process-note {
@@ -424,17 +450,73 @@ def render_step_header(step: int, n_files: int) -> None:
     )
 
 
+ICON_PDF = (
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M7 3.5h7l5 5V20a1.5 1.5 0 0 1-1.5 1.5h-10.5A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5z"/>'
+    '<path d="M14 3.5V9h5.5"/><path d="M8.5 14h7M8.5 17.5h4.5"/>'
+    "</svg>"
+)
+ICON_IMAGE = (
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="4" y="5" width="16" height="14" rx="2"/>'
+    '<circle cx="9" cy="10" r="1.4"/>'
+    '<path d="M7 17l4.2-4.2a1 1 0 0 1 1.4 0L20 16.2"/>'
+    "</svg>"
+)
+ICON_FILE = (
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M7 3.5h7l5 5V20a1.5 1.5 0 0 1-1.5 1.5h-10.5A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5z"/>'
+    '<path d="M14 3.5V9h5.5"/>'
+    "</svg>"
+)
+
+
+def short_name(name: str, max_len: int = 42) -> str:
+    if len(name) <= max_len:
+        return name
+    ext = Path(name).suffix
+    keep = max(12, max_len - len(ext) - 1)
+    return f"{name[:keep]}…{ext}"
+
+
+def file_icon(name: str) -> str:
+    ext = Path(name).suffix.lower()
+    if ext in PDF_EXTS:
+        return ICON_PDF
+    if ext in IMAGE_EXTS:
+        return ICON_IMAGE
+    return ICON_FILE
+
+
 def render_file_chips(files) -> None:
-    # HTML compacto: Streamlit Markdown trata los saltos en blanco entre
-    # bloques como código y muestra el HTML crudo del 2º archivo en adelante.
     chips = "".join(
         '<div class="file-chip">'
-        f'<span class="name">{html.escape(f.name)}</span>'
+        f'<span class="icon">{file_icon(f.name)}</span>'
+        '<span class="body">'
+        f'<span class="name">{html.escape(short_name(f.name))}</span>'
         f'<span class="meta">{format_size(f.size)}</span>'
-        "</div>"
+        "</span></div>"
         for f in files[:MAX_FILES]
     )
-    st.markdown(f'<div class="file-list">{chips}</div>', unsafe_allow_html=True)
+    st.html(
+        "<style>"
+        ".file-list{display:flex;flex-direction:column;gap:10px;margin:4px 0 10px}"
+        ".file-chip{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;"
+        "padding:10px 12px;background:#fff;border:1px solid #D5DEE8;border-radius:8px;"
+        "font-family:Outfit,Helvetica Neue,sans-serif}"
+        ".file-chip .icon{flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;"
+        "justify-content:center;border-radius:6px;background:#F0F4F8;color:#1A4A6E}"
+        ".file-chip .icon svg{display:block;width:18px;height:18px}"
+        ".file-chip .body{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}"
+        ".file-chip .name{color:#0C2644;font-size:.86rem;font-weight:500;overflow:hidden;"
+        "text-overflow:ellipsis;white-space:nowrap}"
+        ".file-chip .meta{color:#5A6B7A;font-size:.75rem}"
+        "</style>"
+        f'<div class="file-list">{chips}</div>'
+    )
 
 
 # --- Hero compacto ---

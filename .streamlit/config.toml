@@ -2,6 +2,9 @@
 headless = true
 maxUploadSize = 80
 fileWatcherType = "none"
+enableCORS = true
+enableXsrfProtection = true
+xsrfCookieSameSite = "none"
 
 [browser]
 gatherUsageStats = false

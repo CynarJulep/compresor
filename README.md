@@ -13,6 +13,24 @@ Doble clic en `INSTALAR_SERVIDOR.bat` para dejarla al arranque.
 
 ## Streamlit Community Cloud
 
+App pública: [compresorsac.streamlit.app](https://compresorsac.streamlit.app)
+
 Repositorio: [github.com/CynarJulep/compresor](https://github.com/CynarJulep/compresor)
 
-[Desplegar en Streamlit](https://share.streamlit.io/deploy?repository=CynarJulep/compresor&branch=master&mainModule=app.py)
+### Insertar en Google Sites
+
+No uses “Insertar por URL” ni la dirección de esta PC (`http://10.3.2.117:8501`): Google Sites es HTTPS y bloquea HTTP.
+
+En el sitio: **Insertar → Insertar código** (no por URL) y pegá:
+
+```html
+<iframe
+  src="https://compresorsac.streamlit.app/?embed=true"
+  width="100%"
+  height="780"
+  style="border:none;"
+  loading="lazy"
+></iframe>
+```
+
+La app tiene que seguir en modo público.

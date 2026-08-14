@@ -38,9 +38,7 @@ st.markdown(
 .stApp::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 3px;
   background: #0C2644;
   z-index: 100;
@@ -57,10 +55,6 @@ footer,
 .stAppDeployButton,
 a[href*="streamlit.io/cloud"],
 a[href*="share.streamlit.io"],
-.viewerBadge_container__1QSob,
-.viewerBadge_link__1S137,
-.viewerBadge_text__1JaDK,
-.styles_viewerBadge__1yB5_,
 [class*="viewerBadge"],
 [class*="ViewerBadge"],
 [data-testid="stBaseButton-headerNoPadding"] {
@@ -70,85 +64,86 @@ a[href*="share.streamlit.io"],
 }
 
 .block-container {
-  max-width: 980px;
-  padding-top: 40px;
-  padding-bottom: 32px;
-  animation: enter 480ms cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 1040px;
+  padding-top: 28px;
+  padding-bottom: 20px;
+  animation: enter 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes enter {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
 }
 
 @keyframes stepIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
 
 h1, .hero-title {
   font-family: "Outfit", sans-serif !important;
   font-weight: 650 !important;
-  font-size: clamp(2.6rem, 5vw, 3.6rem) !important;
-  line-height: 1.08 !important;
+  font-size: clamp(2rem, 3.8vw, 2.75rem) !important;
+  line-height: 1.1 !important;
   letter-spacing: -0.03em !important;
   color: #0C2644 !important;
-  margin: 0 0 1.25rem 0 !important;
+  margin: 0 0 0.45rem 0 !important;
   text-shadow:
     0 1px 0 rgba(255, 255, 255, 0.9),
-    0 8px 22px rgba(12, 38, 68, 0.14);
+    0 6px 18px rgba(12, 38, 68, 0.12);
 }
 
 .welcome {
   color: #2C3D4F;
-  font-size: 0.95rem;
-  line-height: 1.55;
-  max-width: 24rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-width: 46rem;
+  margin: 0 0 1.1rem 0;
   font-family: "Outfit", sans-serif;
 }
 
-.welcome p {
-  margin: 0;
-}
+.welcome p { margin: 0; }
 
-.step-card,
 div[data-testid="stVerticalBlockBorderWrapper"] {
   background: #FFFFFF;
   border: 1px solid #D5DEE8 !important;
   border-radius: 10px !important;
-  padding: 4px 6px 2px;
+  padding: 2px 4px;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
-    0 8px 20px rgba(12, 38, 68, 0.06);
-  animation: stepIn 380ms cubic-bezier(0.16, 1, 0.3, 1);
+    0 6px 16px rgba(12, 38, 68, 0.06);
+  animation: stepIn 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-#paso-actual {
-  padding: 8px 6px 0;
+#paso-actual { padding: 6px 4px 2px; }
+
+.wizard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
 }
 
 .wizard-dots {
   display: flex;
-  gap: 6px;
-  margin: 0 0 12px 0;
+  gap: 5px;
 }
 
 .wizard-dots span {
   display: block;
-  width: 28px;
+  width: 26px;
   height: 3px;
   border-radius: 2px;
   background: #D5DEE8;
-  transition: background 200ms ease;
 }
 
 .wizard-dots span.done,
-.wizard-dots span.current {
-  background: #1A4A6E;
-}
+.wizard-dots span.current { background: #1A4A6E; }
 
 .wizard-kicker {
-  margin: 0 0 2px 0;
+  margin: 0;
   color: #1A4A6E;
   font-size: 0.72rem;
   font-weight: 500;
@@ -156,73 +151,91 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 }
 
 .wizard-title {
-  margin: 0 0 4px 0;
+  margin: 2px 0 0 0;
   color: #0C2644;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   font-family: "Outfit", sans-serif;
   letter-spacing: -0.02em;
 }
 
 .wizard-help {
-  margin: 0 0 14px 0;
+  margin: 4px 0 0 0;
   color: #5A6B7A;
-  font-size: 0.84rem;
-  line-height: 1.4;
+  font-size: 0.82rem;
+  line-height: 1.35;
   font-family: "Outfit", sans-serif;
 }
 
 .file-list {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 0 0 14px 0;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px 0;
 }
 
 .file-chip {
-  display: flex;
-  justify-content: space-between;
+  display: inline-flex;
   align-items: baseline;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 8px;
+  max-width: 100%;
+  padding: 6px 10px;
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-left: 3px solid #1A4A6E;
-  border-radius: 8px;
+  border-radius: 6px;
   font-family: "Outfit", sans-serif;
-  animation: stepIn 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: stepIn 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .file-chip .name {
   color: #0C2644;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 14rem;
 }
 
 .file-chip .meta {
   color: #5A6B7A;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   flex-shrink: 0;
 }
 
 .process-note {
-  margin: 0 0 12px 0;
-  padding: 10px 12px;
+  margin: 0 0 8px 0;
+  padding: 8px 10px;
   background: #F0F4F8;
   border: 1px solid #C5D4E3;
-  border-radius: 8px;
+  border-radius: 6px;
   color: #1A4A6E;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   font-family: "Outfit", sans-serif;
-  animation: stepIn 240ms ease;
 }
 
-.result-block {
-  margin-top: 4px;
-  animation: stepIn 380ms cubic-bezier(0.16, 1, 0.3, 1);
+.action-slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 72px;
+  padding-top: 4px;
+}
+
+.metrics-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0 0 8px 0;
+  font-family: "Outfit", sans-serif;
+  font-size: 0.82rem;
+  color: #2C3D4F;
+}
+
+.metrics-line strong {
+  color: #0C2644;
+  font-weight: 600;
 }
 
 [data-testid="stIconMaterial"] {
@@ -242,13 +255,11 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 
 [data-testid="stFileUploaderDropzone"] {
   position: relative !important;
-  min-height: 72px !important;
+  min-height: 64px !important;
   cursor: pointer;
 }
 
-[data-testid="stFileUploaderDropzone"] > * {
-  opacity: 0 !important;
-}
+[data-testid="stFileUploaderDropzone"] > * { opacity: 0 !important; }
 
 [data-testid="stFileUploaderDropzone"]::after {
   content: "Arrastrá archivos o hacé clic (hasta 5)";
@@ -257,10 +268,10 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 14px;
+  padding: 0 12px;
   color: #1A4A6E;
   font-family: "Outfit", sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 500;
   pointer-events: none;
   text-align: center;
@@ -291,9 +302,9 @@ div.stDownloadButton > button,
   font-family: "Outfit", sans-serif !important;
   font-weight: 500 !important;
   box-shadow: 0 2px 6px rgba(12, 38, 68, 0.12) !important;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   width: 100%;
-  transition: background 180ms ease, border-color 180ms ease, transform 140ms ease;
+  transition: background 160ms ease, border-color 160ms ease, transform 120ms ease;
 }
 
 div.stButton > button:hover,
@@ -316,49 +327,44 @@ div.stButton > button:disabled,
   transform: none;
 }
 
-[data-testid="stImage"] {
-  margin-top: 14px;
+/* Botón secundario más bajo */
+div.stButton:has(button:not([kind="primary"])) > button,
+div.stButton > button[kind="secondary"] {
+  background: #FFFFFF !important;
+  color: #1A4A6E !important;
+  border: 1px solid #C5D4E3 !important;
+  box-shadow: none !important;
+  min-height: 2.2rem;
 }
 
-[data-testid="stImage"] img {
-  max-height: 36px;
-  width: auto;
-}
+[data-testid="stImage"] { margin-top: 10px; }
+[data-testid="stImage"] img { max-height: 32px; width: auto; }
 
 .legal {
-  margin-top: 40px;
-  padding-top: 16px;
+  margin-top: 28px;
+  padding-top: 12px;
   border-top: 1px solid #E2E8F0;
   color: #7A8794;
-  font-size: 0.7rem;
-  line-height: 1.6;
-  max-width: 40rem;
+  font-size: 0.68rem;
+  line-height: 1.55;
+  max-width: 42rem;
   font-family: "Outfit", sans-serif;
 }
 
 .copy, .renzo {
   font-family: "Outfit", sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
 }
 
-.copy {
-  margin-top: 10px;
-  color: #9AA5B1;
-}
-
-.renzo {
-  margin-top: 2px;
-  color: #8A96A3;
-}
+.copy { margin-top: 8px; color: #9AA5B1; }
+.renzo { margin-top: 2px; color: #8A96A3; }
 
 @media (prefers-reduced-motion: reduce) {
-  .block-container, .step-card, .file-chip, .result-block, .process-note {
-    animation: none;
-  }
+  .block-container,
+  div[data-testid="stVerticalBlockBorderWrapper"],
+  .file-chip { animation: none; }
   div.stButton > button:hover,
-  div.stDownloadButton > button:hover {
-    transform: none;
-  }
+  div.stDownloadButton > button:hover { transform: none; }
 }
 </style>
 """,
@@ -385,25 +391,17 @@ def step_copy(step: int, n_files: int) -> tuple[str, str, str]:
         return (
             "Paso 1 de 3",
             "Subí los archivos",
-            "Hasta 5 archivos. PDF o imágenes. Máximo 80 MB cada uno.",
+            "Hasta 5 · PDF o imágenes · máx. 80 MB c/u",
         )
     if step == 2:
         if n_files <= 1:
-            return (
-                "Paso 2 de 3",
-                "Comprimí",
-                "Tocá Comprimir para dejarlo bajo 1 MB.",
-            )
+            return ("Paso 2 de 3", "Comprimí", "Tocá el botón de la derecha.")
         return (
             "Paso 2 de 3",
             "Uní y comprimí",
-            f"{n_files} archivos. Se unen en un PDF y se comprimen a menos de 1 MB.",
+            f"{n_files} archivos → un PDF bajo 1 MB.",
         )
-    return (
-        "Paso 3 de 3",
-        "Descargá",
-        "Listo. Descargá el archivo para el trámite.",
-    )
+    return ("Paso 3 de 3", "Descargá", "Listo para el trámite.")
 
 
 def render_step_header(step: int, n_files: int) -> None:
@@ -415,9 +413,13 @@ def render_step_header(step: int, n_files: int) -> None:
     st.markdown(
         f"""
         <div id="paso-actual">
-          <div class="wizard-dots">{dots}</div>
-          <p class="wizard-kicker">{kicker}</p>
-          <p class="wizard-title">{title}</p>
+          <div class="wizard-top">
+            <div>
+              <p class="wizard-kicker">{kicker}</p>
+              <p class="wizard-title">{title}</p>
+            </div>
+            <div class="wizard-dots">{dots}</div>
+          </div>
           <p class="wizard-help">{help_text}</p>
         </div>
         """,
@@ -439,81 +441,55 @@ def render_file_chips(files) -> None:
     st.markdown(f'<div class="file-list">{"".join(rows)}</div>', unsafe_allow_html=True)
 
 
-def scroll_to_step() -> None:
-    # Script inyectado: Streamlit a veces lo filtra; si no corre, no rompe la UI.
-    st.markdown(
-        """
-        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-             width="0" height="0" alt=""
-             onload="
-               (function(){
-                 var d = window.parent && window.parent.document ? window.parent.document : document;
-                 var el = d.getElementById('paso-actual');
-                 if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-               })();
-             " />
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-# --- Hero ---
+# --- Hero compacto ---
 st.markdown('<h1 class="hero-title">Compresor de archivos</h1>', unsafe_allow_html=True)
+st.markdown(
+    """
+    <div class="welcome">
+      <p>
+        Subí hasta 5 archivos, comprimilos y descargá el resultado para el trámite.
+        Todo corre en la red interna: el archivo no sale de los servidores ni se guarda.
+      </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
-left, right = st.columns((0.95, 1.15), gap="large")
+files = as_file_list(st.session_state.get("upload"))
+current_id = batch_id(files)
+if st.session_state.get("file_id") != current_id:
+    st.session_state.file_id = current_id
+    st.session_state.compress_result = None
+    st.session_state.compress_error = None
+    st.session_state.processing = False
 
-with left:
+has_result = st.session_state.get("compress_result") is not None
+if not files:
+    step = 1
+elif has_result:
+    step = 3
+else:
+    step = 2
+
+if step == 3:
     st.markdown(
         """
-        <div class="welcome">
-          <p>
-            Subí hasta 5 archivos, comprimilos y descargá el resultado
-            para el trámite. Todo corre en la red interna: el archivo no
-            sale de los servidores ni se guarda.
-          </p>
-        </div>
+        <style>
+        [data-testid='stFileUploader']{
+          display:none!important; height:0!important; margin:0!important;
+          padding:0!important; overflow:hidden!important;
+        }
+        </style>
         """,
         unsafe_allow_html=True,
     )
 
-with right:
-    # El widget ya vive en session_state antes del rerender
-    files = as_file_list(st.session_state.get("upload"))
-    current_id = batch_id(files)
-    if st.session_state.get("file_id") != current_id:
-        st.session_state.file_id = current_id
-        st.session_state.compress_result = None
-        st.session_state.compress_error = None
-        st.session_state.processing = False
+with st.container(border=True):
+    render_step_header(step, len(files))
 
-    has_result = st.session_state.get("compress_result") is not None
-    if not files:
-        step = 1
-    elif has_result:
-        step = 3
-    else:
-        step = 2
-
-    if step == 3:
-        st.markdown(
-            """
-            <style>
-            [data-testid='stFileUploader']{
-              display:none!important;
-              height:0!important;
-              margin:0!important;
-              padding:0!important;
-              overflow:hidden!important;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with st.container(border=True):
-        render_step_header(step, len(files))
-
-        # Siempre montar el uploader para no perder el lote en session_state
+    # El uploader siempre se monta (para no perder el lote).
+    # En paso 1 ocupa todo el ancho; en 2–3 queda a la izquierda y la acción a la derecha.
+    if step == 1:
         uploaded = st.file_uploader(
             "Elegí archivos",
             type=["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"],
@@ -522,19 +498,12 @@ with right:
             key="upload",
         )
         files = as_file_list(uploaded)
-
         current_id = batch_id(files)
         if st.session_state.get("file_id") != current_id:
             st.session_state.file_id = current_id
             st.session_state.compress_result = None
             st.session_state.compress_error = None
             st.session_state.processing = False
-            has_result = False
-            if files:
-                step = 2
-            else:
-                step = 1
-
         too_many = len(files) > MAX_FILES
         if too_many:
             ui.alert(
@@ -543,123 +512,147 @@ with right:
                 variant="destructive",
                 key="too_many",
             )
-
-        if files and step >= 2:
-            render_file_chips(files)
-
-        if st.session_state.get("processing"):
-            n = len(files)
-            msg = "Comprimiendo…" if n <= 1 else "Uniendo y comprimiendo…"
-            st.markdown(f'<p class="process-note">{msg}</p>', unsafe_allow_html=True)
-
         go = False
-        if step == 2 and files and not too_many and not st.session_state.get("processing"):
-            label = "Comprimir" if len(files) == 1 else "Unir y comprimir"
-            go = st.button(label, type="primary")
+        result = None
+    else:
+        col_info, col_action = st.columns((1.35, 0.9), gap="medium")
 
-        if go:
-            st.session_state.processing = True
-            st.session_state.compress_error = None
-            st.rerun()
-
-        if st.session_state.get("processing") and files and not too_many:
-            items = []
-            bad = None
-            for f in files[:MAX_FILES]:
-                name = f.name or "archivo"
-                if not supported_extension(name):
-                    bad = f"Formato no soportado: {name}"
-                    break
-                items.append((f.getvalue(), name))
-
-            if bad:
-                st.session_state.compress_result = None
-                st.session_state.compress_error = bad
-                st.session_state.processing = False
-                st.rerun()
-            else:
-                try:
-                    st.session_state.compress_result = compress_uploads(items)
-                    st.session_state.compress_error = None
-                except ValueError as exc:
-                    st.session_state.compress_result = None
-                    st.session_state.compress_error = str(exc)
-                except Exception:
-                    st.session_state.compress_result = None
-                    st.session_state.compress_error = (
-                        "No se pudo procesar. Probá con menos archivos o un PDF más corto."
-                    )
-                finally:
-                    st.session_state.processing = False
-                st.rerun()
-
-        if st.session_state.get("compress_error"):
-            ui.alert(
-                "No se pudo comprimir",
-                description=st.session_state.compress_error,
-                variant="destructive",
-                key="err",
+        with col_info:
+            uploaded = st.file_uploader(
+                "Elegí archivos",
+                type=["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"],
+                accept_multiple_files=True,
+                label_visibility="collapsed",
+                key="upload",
             )
+            files = as_file_list(uploaded)
 
-        result = st.session_state.get("compress_result")
-        if result is not None and (step == 3 or has_result):
-            saved = result.original_size - result.final_size
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                ui.metric_card("Original", format_size(result.original_size), key="m_orig")
-            with c2:
-                ui.metric_card("Resultado", format_size(result.final_size), key="m_out")
-            with c3:
-                ui.metric_card("Techo", format_size(TARGET_BYTES), key="m_cap")
-
-            if result.already_ok:
-                ui.alert(
-                    "Ya estaba por debajo de 1 MB",
-                    description="Se entrega con el nombre de versión comprimida.",
-                    key="ok_passthrough",
-                )
-            elif result.under_limit:
-                extra = result.note or f"Ahorro: {format_size(max(saved, 0))}."
-                ui.alert("Listo para descargar", description=extra, key="ok_done")
-            else:
-                ui.alert(
-                    "Quedó por encima de 1 MB",
-                    description=result.note or "Se entrega la versión más liviana posible.",
-                    variant="destructive",
-                    key="warn_over",
-                )
-
-            mime = (
-                "application/pdf"
-                if result.filename.lower().endswith(".pdf")
-                else "application/octet-stream"
-            )
-            st.download_button(
-                "Descargar",
-                data=result.data,
-                file_name=result.filename,
-                mime=mime,
-                type="primary",
-            )
-            if st.button("Empezar de nuevo"):
+            current_id = batch_id(files)
+            if st.session_state.get("file_id") != current_id:
+                st.session_state.file_id = current_id
                 st.session_state.compress_result = None
                 st.session_state.compress_error = None
                 st.session_state.processing = False
-                st.session_state.file_id = None
-                if "upload" in st.session_state:
-                    del st.session_state["upload"]
-                st.rerun()
+                has_result = False
+                step = 2 if files else 1
 
-    if st.session_state.get("last_step") != step:
-        st.session_state.last_step = step
-        scroll_to_step()
+            too_many = len(files) > MAX_FILES
+            if too_many:
+                ui.alert(
+                    "Máximo 5 archivos",
+                    description="Quitá algunos para continuar.",
+                    variant="destructive",
+                    key="too_many",
+                )
+
+            if files:
+                render_file_chips(files)
+
+            if st.session_state.get("processing"):
+                n = len(files)
+                msg = "Comprimiendo…" if n <= 1 else "Uniendo y comprimiendo…"
+                st.markdown(f'<p class="process-note">{msg}</p>', unsafe_allow_html=True)
+
+            if st.session_state.get("compress_error"):
+                ui.alert(
+                    "No se pudo comprimir",
+                    description=st.session_state.compress_error,
+                    variant="destructive",
+                    key="err",
+                )
+
+            result = st.session_state.get("compress_result")
+            if result is not None and step == 3:
+                saved = result.original_size - result.final_size
+                st.markdown(
+                    f"""
+                    <div class="metrics-line">
+                      <span>Original <strong>{format_size(result.original_size)}</strong></span>
+                      <span>Resultado <strong>{format_size(result.final_size)}</strong></span>
+                      <span>Techo <strong>{format_size(TARGET_BYTES)}</strong></span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+                if result.already_ok:
+                    st.caption("Ya estaba bajo 1 MB. Se entrega como versión comprimida.")
+                elif result.under_limit:
+                    st.caption(result.note or f"Ahorro: {format_size(max(saved, 0))}.")
+                else:
+                    st.caption(
+                        result.note or "Quedó por encima de 1 MB; se entrega lo más liviano posible."
+                    )
+
+        with col_action:
+            go = False
+            if step == 2 and files and not too_many and not st.session_state.get("processing"):
+                label = "Comprimir" if len(files) == 1 else "Unir y comprimir"
+                go = st.button(label, type="primary", use_container_width=True)
+            elif step == 3 and result is not None:
+                mime = (
+                    "application/pdf"
+                    if result.filename.lower().endswith(".pdf")
+                    else "application/octet-stream"
+                )
+                st.download_button(
+                    "Descargar",
+                    data=result.data,
+                    file_name=result.filename,
+                    mime=mime,
+                    type="primary",
+                    use_container_width=True,
+                )
+                if st.button("Empezar de nuevo", use_container_width=True):
+                    st.session_state.compress_result = None
+                    st.session_state.compress_error = None
+                    st.session_state.processing = False
+                    st.session_state.file_id = None
+                    if "upload" in st.session_state:
+                        del st.session_state["upload"]
+                    st.rerun()
+
+    if go:
+        st.session_state.processing = True
+        st.session_state.compress_error = None
+        st.rerun()
+
+    if st.session_state.get("processing") and files and not too_many:
+        items = []
+        bad = None
+        for f in files[:MAX_FILES]:
+            name = f.name or "archivo"
+            if not supported_extension(name):
+                bad = f"Formato no soportado: {name}"
+                break
+            items.append((f.getvalue(), name))
+
+        if bad:
+            st.session_state.compress_result = None
+            st.session_state.compress_error = bad
+            st.session_state.processing = False
+            st.rerun()
+        else:
+            try:
+                st.session_state.compress_result = compress_uploads(items)
+                st.session_state.compress_error = None
+            except ValueError as exc:
+                st.session_state.compress_result = None
+                st.session_state.compress_error = str(exc)
+            except Exception:
+                st.session_state.compress_result = None
+                st.session_state.compress_error = (
+                    "No se pudo procesar. Probá con menos archivos o un PDF más corto."
+                )
+            finally:
+                st.session_state.processing = False
+            st.rerun()
 
 st.markdown(
     """
     <div class="legal">
-      Compresor de <strong>Atención Ciudadana</strong>. Los archivos se procesan
-      de forma temporal, sin almacenamiento persistente. Hasta 5 archivos se pueden
-      unir en un PDF. La calidad visual puede reducirse para respetar el límite de 1&nbsp;MB.
+      Compresor de <strong>Atención Ciudadana</strong>. Procesamiento temporal, sin almacenamiento
+      persistente. Hasta 5 archivos se pueden unir en un PDF. La calidad puede bajarse para
+      respetar 1&nbsp;MB.
     </div>
     <p class="copy">© 2026 Atención Ciudadana de la Municipalidad de Santa Fe. Todos los derechos reservados.</p>
     <p class="renzo">Desarrollado y mantenido por Renzo.</p>
@@ -667,4 +660,4 @@ st.markdown(
     unsafe_allow_html=True,
 )
 if LOGO.exists():
-    st.image(str(LOGO), width=180)
+    st.image(str(LOGO), width=160)

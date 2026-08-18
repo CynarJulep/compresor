@@ -14,6 +14,7 @@ from compressor import (
     format_size,
     supported_extension,
 )
+from explainer import render_explainer
 
 ROOT = Path(__file__).resolve().parent
 LOGO = ROOT / "assets" / "brand" / "msf-horizontal.png"
@@ -30,7 +31,7 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap');
 
 .stApp {
   background: #F4F6F8;
@@ -578,7 +579,8 @@ st.markdown(
     """
     <div class="welcome">
       <p>
-        Subí hasta 5 archivos, comprimilos y descargá el resultado para el trámite.
+        Las plataformas municipales rechazan archivos de más de 1 MB.
+        Subí hasta 5, comprimilos acá y descargá el resultado para el trámite.
         Todo corre en la red interna: el archivo no sale de los servidores ni se guarda.
       </p>
     </div>
@@ -599,6 +601,9 @@ elif has_result:
     step = 3
 else:
     step = 2
+
+if step == 1:
+    render_explainer()
 
 UPLOAD_TYPES = ["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"]
 show_uploader = step < 3 and len(files) < MAX_FILES

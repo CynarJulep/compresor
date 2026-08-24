@@ -6,8 +6,8 @@ name: Keep Streamlit awake
 
 on:
   schedule:
-    # Cada 12 h (UTC). Hibernación de Streamlit ≈ 12 h sin tráfico.
-    - cron: "0 */12 * * *"
+    # ~Cada 10 h (UTC: 00, 10, 20). Hibernación de Streamlit ≈ 12 h.
+    - cron: "0 */10 * * *"
   workflow_dispatch:
 
 concurrency:

@@ -1,13 +1,12 @@
 # Mantiene despierta la app en Streamlit Community Cloud.
-# Hiberna tras ~12 h sin tráfico de usuario; un curl simple NO alcanza
-# (solo sirve el HTML estático). Hace falta un navegador que ejecute JS
-# y abra el WebSocket de Streamlit. Desde Google Sites el botón "Wake"
-# no funciona bien en el iframe.
+# Hiberna tras ~12 h sin tráfico de usuario. Un curl NO alcanza:
+# hace falta un navegador (JS + WebSocket). El botón Wake no sirve
+# bien dentro del iframe de Google Sites.
 name: Keep Streamlit awake
 
 on:
   schedule:
-    # Cada 6 h (UTC) — margen amplio frente a las 12 h de hibernación
+    # Cada 6 h (UTC) — margen frente a las 12 h de hibernación
     - cron: "0 */6 * * *"
   workflow_dispatch:
 
@@ -18,7 +17,7 @@ concurrency:
 jobs:
   wake:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - name: Install Playwright
         run: |
@@ -27,66 +26,108 @@ jobs:
 
       - name: Open app (wake if sleeping)
         env:
-          APP_URL: https://compresorsac.streamlit.app/?embed=true
+          APP_URL: https://compresorsac.streamlit.app/
+          PYTHONUNBUFFERED: "1"
         run: |
           python <<'PY'
-          import os, sys, time
+          import os, sys, time, re
           from playwright.sync_api import sync_playwright
 
           url = os.environ["APP_URL"]
-          print(f"Opening {url}")
+          print(f"Opening {url}", flush=True)
+
+          def looks_awake(page) -> bool:
+              title = (page.title() or "").lower()
+              if "compresor" in title or "atención" in title or "atencion" in title:
+                  return True
+              # Marcadores típicos de Streamlit ya montado
+              for sel in (
+                  "[data-testid='stApp']",
+                  "[data-testid='stAppViewContainer']",
+                  "#root [class*='stApp']",
+                  "iframe[title*='streamlit']",
+              ):
+                  try:
+                      if page.locator(sel).count() > 0:
+                          return True
+                  except Exception:
+                      pass
+              html = page.content().lower()
+              if "data-testid=\"stapp\"" in html.replace("'", '"'):
+                  return True
+              if "compresor de archivos" in html:
+                  return True
+              return False
+
+          def click_wake(page) -> bool:
+              # Botón oficial + variantes por texto
+              patterns = [
+                  page.get_by_role("button", name=re.compile(r"get this app back", re.I)),
+                  page.locator("button:has-text('get this app back')"),
+                  page.locator("a:has-text('get this app back')"),
+                  page.locator("text=/Yes,? get this app back up!?/i"),
+              ]
+              for loc in patterns:
+                  try:
+                      if loc.count() > 0:
+                          print(f"Sleeping — clicking wake: {loc.first}", flush=True)
+                          loc.first.click(timeout=15_000)
+                          time.sleep(10)
+                          return True
+                  except Exception as e:
+                      print(f"wake click skip: {e}", flush=True)
+              return False
 
           with sync_playwright() as p:
               browser = p.chromium.launch(headless=True)
-              page = browser.new_page()
-              page.goto(url, wait_until="domcontentloaded", timeout=90_000)
-              time.sleep(3)
+              context = browser.new_context(
+                  user_agent=(
+                      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/122.0.0.0 Safari/537.36"
+                  ),
+                  locale="es-AR",
+              )
+              page = context.new_page()
+              page.goto(url, wait_until="domcontentloaded", timeout=120_000)
+              time.sleep(5)
 
-              # Botón de hibernación de Community Cloud
-              for label in (
-                  "Yes, get this app back up!",
-                  "Yes, get this app back up",
-                  "Get this app back up",
-              ):
-                  btn = page.get_by_role("button", name=label)
-                  if btn.count() > 0:
-                      print(f"Sleeping — clicking: {label}")
-                      btn.first.click()
-                      page.wait_for_load_state("domcontentloaded", timeout=90_000)
-                      time.sleep(8)
-                      break
-              else:
-                  # También por texto genérico por si cambia el copy
-                  wake = page.locator("button:has-text('get this app back')")
-                  if wake.count() > 0:
-                      print("Sleeping — clicking wake button (fallback)")
-                      wake.first.click()
-                      time.sleep(8)
-
-              # Esperar señal de que Streamlit arrancó (health o UI)
-              ok = False
-              for i in range(24):
-                  try:
-                      health = page.request.get(
-                          "https://compresorsac.streamlit.app/_stcore/health",
-                          timeout=10_000,
-                      )
-                      body = (health.text() or "").strip().lower()
-                      print(f"[{i}] health={health.status} body={body[:40]!r}")
-                      if health.status == 200 and body in ("ok", "ok\n"):
-                          ok = True
-                          break
-                  except Exception as e:
-                      print(f"[{i}] health error: {e}")
-                  # UI embebida / título
-                  if page.locator("text=Compresor").count() > 0:
-                      print(f"[{i}] UI text found")
-                      ok = True
-                      break
+              woke = click_wake(page)
+              if woke:
+                  page.wait_for_load_state("domcontentloaded", timeout=120_000)
                   time.sleep(5)
 
-              title = page.title()
-              print(f"title={title!r} ok={ok}")
+              ok = False
+              for i in range(30):
+                  title = page.title()
+                  awake = looks_awake(page)
+                  print(f"[{i}] title={title!r} awake={awake}", flush=True)
+                  if awake:
+                      # Mantener la sesión un poco para que cuente como tráfico
+                      time.sleep(20)
+                      ok = True
+                      break
+                  # Reintentar wake si aparece más tarde
+                  click_wake(page)
+                  time.sleep(5)
+
+              # Evidencia si falla
+              if not ok:
+                  page.screenshot(path="keepalive-fail.png", full_page=True)
+                  with open("keepalive-fail.html", "w", encoding="utf-8") as f:
+                      f.write(page.content())
+                  print("Saved keepalive-fail.png / .html", flush=True)
+
               browser.close()
               sys.exit(0 if ok else 1)
           PY
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keepalive-debug
+          path: |
+            keepalive-fail.png
+            keepalive-fail.html
+          if-no-files-found: ignore

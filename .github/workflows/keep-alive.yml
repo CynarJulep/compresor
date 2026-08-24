@@ -1,0 +1,92 @@
+# Mantiene despierta la app en Streamlit Community Cloud.
+# Hiberna tras ~12 h sin tráfico de usuario; un curl simple NO alcanza
+# (solo sirve el HTML estático). Hace falta un navegador que ejecute JS
+# y abra el WebSocket de Streamlit. Desde Google Sites el botón "Wake"
+# no funciona bien en el iframe.
+name: Keep Streamlit awake
+
+on:
+  schedule:
+    # Cada 6 h (UTC) — margen amplio frente a las 12 h de hibernación
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: keep-streamlit-awake
+  cancel-in-progress: true
+
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Install Playwright
+        run: |
+          pip install --quiet playwright
+          playwright install --with-deps chromium
+
+      - name: Open app (wake if sleeping)
+        env:
+          APP_URL: https://compresorsac.streamlit.app/?embed=true
+        run: |
+          python <<'PY'
+          import os, sys, time
+          from playwright.sync_api import sync_playwright
+
+          url = os.environ["APP_URL"]
+          print(f"Opening {url}")
+
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              page = browser.new_page()
+              page.goto(url, wait_until="domcontentloaded", timeout=90_000)
+              time.sleep(3)
+
+              # Botón de hibernación de Community Cloud
+              for label in (
+                  "Yes, get this app back up!",
+                  "Yes, get this app back up",
+                  "Get this app back up",
+              ):
+                  btn = page.get_by_role("button", name=label)
+                  if btn.count() > 0:
+                      print(f"Sleeping — clicking: {label}")
+                      btn.first.click()
+                      page.wait_for_load_state("domcontentloaded", timeout=90_000)
+                      time.sleep(8)
+                      break
+              else:
+                  # También por texto genérico por si cambia el copy
+                  wake = page.locator("button:has-text('get this app back')")
+                  if wake.count() > 0:
+                      print("Sleeping — clicking wake button (fallback)")
+                      wake.first.click()
+                      time.sleep(8)
+
+              # Esperar señal de que Streamlit arrancó (health o UI)
+              ok = False
+              for i in range(24):
+                  try:
+                      health = page.request.get(
+                          "https://compresorsac.streamlit.app/_stcore/health",
+                          timeout=10_000,
+                      )
+                      body = (health.text() or "").strip().lower()
+                      print(f"[{i}] health={health.status} body={body[:40]!r}")
+                      if health.status == 200 and body in ("ok", "ok\n"):
+                          ok = True
+                          break
+                  except Exception as e:
+                      print(f"[{i}] health error: {e}")
+                  # UI embebida / título
+                  if page.locator("text=Compresor").count() > 0:
+                      print(f"[{i}] UI text found")
+                      ok = True
+                      break
+                  time.sleep(5)
+
+              title = page.title()
+              print(f"title={title!r} ok={ok}")
+              browser.close()
+              sys.exit(0 if ok else 1)
+          PY

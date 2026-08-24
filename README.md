@@ -106,6 +106,8 @@ Sigue siendo un documento sensible: usá la app **oficial del área**, no clones
 
 Repositorio: [github.com/CynarJulep/compresor](https://github.com/CynarJulep/compresor)
 
+Streamlit Community Cloud **hiberna** la app tras **~12 horas sin tráfico de usuario**. Dentro de un iframe de Google Sites **no se puede despertar** (el botón de wake no funciona bien embebido). El workflow `.github/workflows/keep-alive.yml` abre la app con un navegador real (Playwright) cada 6 horas — un `curl` no alcanza porque solo sirve HTML estático. También se puede disparar a mano en **Actions → Keep Streamlit awake → Run workflow**.
+
 ---
 
 ## Insertar en Google Sites
@@ -130,6 +132,8 @@ En el sitio: **Insertar → Insertar código** (no por URL) y pegá:
 ```
 
 La app tiene que seguir publicada en modo público para que el iframe cargue.
+
+Si alguna vez el embed queda en blanco, agregá un enlace de respaldo debajo del iframe: [Abrir el compresor](https://compresorsac.streamlit.app) (abre en pestaña nueva y ahí sí se puede despertar).
 
 ---
 

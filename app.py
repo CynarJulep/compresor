@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-
+import base64
 import html
 
 import streamlit as st
@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parent
 LOGO = ROOT / "assets" / "brand" / "msf-horizontal.png"
 ICON = ROOT / "assets" / "brand" / "msf-icon.png"
 ICONS_DIR = ROOT / "assets" / "icons"
+COMPRESS_MARK = ICONS_DIR / "compress.png"
 
 st.set_page_config(
     page_title="Compresor de archivos — Atención Ciudadana",
@@ -114,24 +115,14 @@ h1, .hero-title {
 
 .hero-mark {
   flex-shrink: 0;
-  display: inline-block;
-  font-family: "Material Symbols Rounded" !important;
-  font-weight: 300 !important;
-  font-style: normal !important;
-  font-size: clamp(4.8rem, 14vw, 7.2rem) !important;
-  line-height: 1 !important;
-  color: #1A4A6E;
-  opacity: 0.14;
-  letter-spacing: normal !important;
-  text-transform: none !important;
-  white-space: nowrap;
-  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 48;
-  -webkit-font-feature-settings: "liga";
-  font-feature-settings: "liga";
-  -webkit-font-smoothing: antialiased;
+  display: block;
+  width: clamp(4.6rem, 13vw, 7rem);
+  height: auto;
+  opacity: 0.13;
   pointer-events: none;
   user-select: none;
-  transform: translate(6px, 2px);
+  transform: translate(4px, 2px);
+  filter: brightness(0) saturate(100%) invert(16%) sepia(24%) saturate(1400%) hue-rotate(178deg);
 }
 
 .welcome {
@@ -839,11 +830,17 @@ def render_file_rows(files: list[HeldFile], *, allow_remove: bool) -> None:
 
 
 # --- Hero compacto ---
+_mark_src = ""
+if COMPRESS_MARK.exists():
+    _mark_src = (
+        "data:image/png;base64,"
+        + base64.b64encode(COMPRESS_MARK.read_bytes()).decode("ascii")
+    )
 st.html(
-    """
+    f"""
     <div class="hero">
       <h1 class="hero-title">Compresor de archivos</h1>
-      <span class="hero-mark material-symbols-rounded" aria-hidden="true">folder_zip</span>
+      {'<img class="hero-mark" src="' + _mark_src + '" alt="" aria-hidden="true">' if _mark_src else ""}
     </div>
     """
 )

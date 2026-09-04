@@ -94,8 +94,8 @@ a[href*="share.streamlit.io"],
   justify-content: space-between;
   gap: 12px;
   margin: 0 0 0.35rem 0;
-  min-height: 4.5rem;
-  overflow: hidden;
+  min-height: 6.5rem;
+  overflow: visible;
 }
 
 h1, .hero-title {
@@ -116,13 +116,29 @@ h1, .hero-title {
 .hero-mark {
   flex-shrink: 0;
   display: block;
-  width: clamp(4.6rem, 13vw, 7rem);
+  width: clamp(7rem, 18vw, 10.5rem);
   height: auto;
-  opacity: 0.13;
+  opacity: 0.34;
   pointer-events: none;
   user-select: none;
-  transform: translate(4px, 2px);
+  transform-origin: center center;
   filter: brightness(0) saturate(100%) invert(16%) sepia(24%) saturate(1400%) hue-rotate(178deg);
+  animation: heroCompress 2.8s ease-in-out infinite;
+}
+
+@keyframes heroCompress {
+  0%, 100% {
+    opacity: 0.28;
+    transform: translate(4px, 2px) scale(1) scaleY(1);
+  }
+  45% {
+    opacity: 0.42;
+    transform: translate(4px, 2px) scale(0.96) scaleY(0.88);
+  }
+  55% {
+    opacity: 0.42;
+    transform: translate(4px, 2px) scale(0.96) scaleY(0.88);
+  }
 }
 
 .welcome {
@@ -530,7 +546,12 @@ div.stButton > button[kind="secondary"] {
 @media (prefers-reduced-motion: reduce) {
   .block-container,
   div[data-testid="stVerticalBlockBorderWrapper"],
-  .file-chip { animation: none; }
+  .file-chip,
+  .hero-mark { animation: none; }
+  .hero-mark {
+    opacity: 0.34;
+    transform: translate(4px, 2px);
+  }
   div.stButton > button:hover,
   div.stDownloadButton > button:hover { transform: none; }
   body.compresor-dragging [data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stFileUploaderDropzone"])::before {

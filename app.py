@@ -4,11 +4,13 @@ from pathlib import Path
 import html
 
 import streamlit as st
+import streamlit.components.v1 as components
 import streamlit_shadcn_ui as ui
 
 from compressor import (
     IMAGE_EXTS,
     MAX_FILES,
+    MAX_INPUT_BYTES,
     TARGET_BYTES,
     compress_uploads,
     format_size,
@@ -146,16 +148,16 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 .wizard-dots span.done,
 .wizard-dots span.current { background: #1A4A6E; }
 
-.wizard-kicker {
+.wizard-title-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   margin: 0;
-  color: #1A4A6E;
-  font-size: 0.92rem;
-  font-weight: 600;
-  font-family: "Outfit", sans-serif;
 }
 
 .wizard-title {
-  margin: 4px 0 0 0;
+  margin: 0;
   color: #0C2644;
   font-size: 1.45rem;
   font-weight: 650;
@@ -165,10 +167,10 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 }
 
 .wizard-help {
-  margin: 6px 0 0 0;
+  margin: 0;
   color: #5A6B7A;
   font-size: 0.92rem;
-  line-height: 1.4;
+  line-height: 1.3;
   font-family: "Outfit", sans-serif;
 }
 
@@ -267,39 +269,90 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
   text-transform: none !important;
 }
 
-[data-testid="stFileUploader"] section,
-[data-testid="stFileUploaderDropzone"] {
-  background: #FFFFFF !important;
-  border: 1px solid #D5DEE8 !important;
-  border-radius: 8px !important;
+[data-testid="stFileUploader"] {
+  width: 100%;
+}
+
+[data-testid="stFileUploader"] section {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 [data-testid="stFileUploaderDropzone"] {
   position: relative !important;
-  min-height: 64px !important;
+  min-height: 168px !important;
   cursor: pointer;
+  background: #F7FAFC !important;
+  border: 1.5px dashed #A8B8C8 !important;
+  border-radius: 10px !important;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 [data-testid="stFileUploaderDropzone"] > * { opacity: 0 !important; }
 
 [data-testid="stFileUploaderDropzone"]::after {
-  content: "Arrastrá archivos o hacé clic (hasta 5)";
+  content: "Arrastrá archivos acá o hacé clic";
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
+  padding: 0 18px;
   color: #1A4A6E;
   font-family: "Outfit", sans-serif;
-  font-size: 0.88rem;
-  font-weight: 500;
+  font-size: 1.05rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
   pointer-events: none;
   text-align: center;
+  transition: color 160ms ease, font-size 160ms ease, opacity 160ms ease;
 }
 
 [data-testid="stFileUploaderDropzone"]:hover {
   border-color: #1A4A6E !important;
+  background: #F0F4F8 !important;
+}
+
+body.compresor-dragging [data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stFileUploaderDropzone"]) {
+  position: relative !important;
+}
+
+body.compresor-dragging [data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stFileUploaderDropzone"])::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  border-radius: 10px;
+  background: rgba(244, 246, 248, 0.55);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  pointer-events: none;
+}
+
+body.compresor-dragging [data-testid="stFileUploader"] > section,
+body.compresor-dragging [data-testid="stFileUploaderDropzone"] {
+  height: 100% !important;
+  min-height: 100% !important;
+  border-radius: 10px !important;
+  border: 2px dashed #1A4A6E !important;
+  background: rgba(255, 255, 255, 0.42) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(26, 74, 110, 0.1),
+    0 12px 40px rgba(12, 38, 68, 0.08);
+}
+
+body.compresor-dragging [data-testid="stFileUploaderDropzone"]::after {
+  content: "Soltá el archivo acá";
+  font-size: clamp(1.45rem, 3.2vw, 2rem);
+  font-weight: 650;
+  color: #0C2644;
+  letter-spacing: -0.03em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 [data-testid="stFileUploaderFile"],
@@ -452,6 +505,11 @@ div.stButton > button[kind="secondary"] {
   .file-chip { animation: none; }
   div.stButton > button:hover,
   div.stDownloadButton > button:hover { transform: none; }
+  body.compresor-dragging [data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stFileUploaderDropzone"])::before {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(244, 246, 248, 0.88);
+  }
 }
 </style>
 """,
@@ -480,6 +538,7 @@ def ingest_uploads(uploaded) -> bool:
     seen = {(f.name, f.size) for f in managed}
     changed = False
     overflow = False
+    too_large: str | None = None
     for f in as_file_list(uploaded):
         key = (f.name, f.size)
         if key in seen:
@@ -487,11 +546,18 @@ def ingest_uploads(uploaded) -> bool:
         if len(managed) >= MAX_FILES:
             overflow = True
             break
+        if f.size > MAX_INPUT_BYTES:
+            too_large = (
+                f"{f.name} pesa {format_size(f.size)}. "
+                f"El tamaño máximo es {format_size(MAX_INPUT_BYTES)}."
+            )
+            continue
         managed.append(HeldFile(name=f.name, size=f.size, data=f.getvalue()))
         seen.add(key)
         changed = True
     st.session_state.managed = managed
     st.session_state.too_many = overflow
+    st.session_state.too_large = too_large
     return changed
 
 
@@ -511,6 +577,7 @@ def remove_file(index: int) -> None:
         managed.pop(index)
     st.session_state.managed = managed
     st.session_state.too_many = False
+    st.session_state.too_large = None
     bump_uploader()
     reset_result()
 
@@ -518,43 +585,167 @@ def remove_file(index: int) -> None:
 def clear_all_files() -> None:
     st.session_state.managed = []
     st.session_state.too_many = False
+    st.session_state.too_large = None
     bump_uploader()
     reset_result()
 
 
-def step_copy(step: int, n_files: int) -> tuple[str, str, str]:
+def render_upload_alerts() -> None:
+    if st.session_state.get("too_many"):
+        ui.alert(
+            "Máximo 5 archivos",
+            description="Quitá algunos para continuar.",
+            variant="destructive",
+            key="too_many_alert",
+        )
+    too_large = st.session_state.get("too_large")
+    if too_large:
+        ui.alert(
+            "Archivo demasiado grande",
+            description=str(too_large),
+            variant="destructive",
+            key="too_large_alert",
+        )
+
+
+def inject_dropzone_enhancer() -> None:
+    """Detecta drag de archivos y agranda la zona de soltado a todo el componente."""
+    components.html(
+        """
+<script>
+(function () {
+  const doc = window.parent.document;
+  if (doc.documentElement.dataset.compresorDropbound === "1") return;
+  doc.documentElement.dataset.compresorDropbound = "1";
+
+  let depth = 0;
+
+  const isFileDrag = (e) => {
+    try {
+      const types = e.dataTransfer && e.dataTransfer.types;
+      if (!types) return false;
+      return Array.from(types).includes("Files");
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const findWrap = () =>
+    doc.querySelector(
+      '[data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stFileUploaderDropzone"])'
+    );
+
+  const uploaderVisible = () => {
+    const dz = doc.querySelector('[data-testid="stFileUploaderDropzone"]');
+    if (!dz) return false;
+    const style = window.parent.getComputedStyle(dz);
+    const hiddenParent = dz.closest('[data-testid="stFileUploader"]');
+    if (hiddenParent) {
+      const ps = window.parent.getComputedStyle(hiddenParent);
+      if (ps.display === "none" || ps.visibility === "hidden") return false;
+    }
+    return style.display !== "none" && style.visibility !== "hidden" && dz.offsetHeight > 0;
+  };
+
+  const clearUploaderInline = () => {
+    doc.querySelectorAll('[data-testid="stFileUploader"]').forEach((el) => {
+      el.style.removeProperty("position");
+      el.style.removeProperty("left");
+      el.style.removeProperty("top");
+      el.style.removeProperty("width");
+      el.style.removeProperty("height");
+      el.style.removeProperty("z-index");
+      el.style.removeProperty("margin");
+    });
+  };
+
+  const setDrag = (on) => {
+    const wrap = findWrap();
+    const uploader = wrap && wrap.querySelector('[data-testid="stFileUploader"]');
+
+    if (!on || !uploaderVisible() || !wrap || !uploader) {
+      doc.body.classList.remove("compresor-dragging");
+      clearUploaderInline();
+      return;
+    }
+
+    doc.body.classList.add("compresor-dragging");
+    const r = wrap.getBoundingClientRect();
+    uploader.style.position = "fixed";
+    uploader.style.left = r.left + "px";
+    uploader.style.top = r.top + "px";
+    uploader.style.width = r.width + "px";
+    uploader.style.height = r.height + "px";
+    uploader.style.zIndex = "40";
+    uploader.style.margin = "0";
+  };
+
+  doc.addEventListener("dragenter", (e) => {
+    if (!isFileDrag(e)) return;
+    e.preventDefault();
+    depth += 1;
+    setDrag(true);
+  }, true);
+
+  doc.addEventListener("dragover", (e) => {
+    if (!isFileDrag(e)) return;
+    e.preventDefault();
+    setDrag(true);
+  }, true);
+
+  doc.addEventListener("dragleave", (e) => {
+    if (!isFileDrag(e)) return;
+    depth = Math.max(0, depth - 1);
+    if (depth === 0) setDrag(false);
+  }, true);
+
+  const clear = () => {
+    depth = 0;
+    setDrag(false);
+  };
+
+  doc.addEventListener("drop", clear, true);
+  doc.addEventListener("dragend", clear, true);
+  window.parent.addEventListener("blur", clear);
+})();
+</script>
+        """,
+        height=0,
+        width=0,
+    )
+
+
+def step_copy(step: int, n_files: int) -> tuple[str, str]:
     if step == 1:
         return (
-            "Paso 1 de 3",
             "Subí los archivos",
-            "Hasta 5 · PDF o imágenes · máx. 80 MB c/u",
+            "Hasta 5 · PDF o imágenes",
         )
     if step == 2:
         if n_files <= 1:
-            return ("Paso 2 de 3", "Comprimí", "Tocá el botón de la derecha.")
+            return ("Comprimí", "Tocá el botón de la derecha.")
         return (
-            "Paso 2 de 3",
             "Uní y comprimí",
             f"{n_files} archivos → un PDF bajo 1 MB.",
         )
-    return ("Paso 3 de 3", "Descargá", "Listo para el trámite.")
+    return ("Descargá", "Listo para el trámite.")
 
 
 def render_step_header(step: int, n_files: int) -> None:
-    kicker, title, help_text = step_copy(step, n_files)
+    title, help_text = step_copy(step, n_files)
     dots = "".join(
         f'<span class="{"done" if i < step else "current" if i == step else "todo"}"></span>'
         for i in range(1, 4)
     )
     st.markdown(
         '<div id="paso-actual">'
-        '<div class="wizard-top"><div>'
-        f'<p class="wizard-kicker">{kicker}</p>'
+        '<div class="wizard-top">'
+        '<div class="wizard-title-row">'
         f'<p class="wizard-title">{title}</p>'
+        f'<p class="wizard-help">{help_text}</p>'
         "</div>"
         f'<div class="wizard-dots">{dots}</div>'
         "</div>"
-        f'<p class="wizard-help">{help_text}</p>'
         "</div>",
         unsafe_allow_html=True,
     )
@@ -677,13 +868,7 @@ with st.container(border=True):
             st.rerun()
         files = list(st.session_state.managed)
         too_many = bool(st.session_state.get("too_many"))
-        if too_many:
-            ui.alert(
-                "Máximo 5 archivos",
-                description="Quitá algunos para continuar.",
-                variant="destructive",
-                key="too_many_alert",
-            )
+        render_upload_alerts()
         if files:
             render_file_rows(files, allow_remove=True)
             if st.button("Quitar todos", type="secondary", key="clear_all_1"):
@@ -704,13 +889,7 @@ with st.container(border=True):
                 # Hay que montar el widget con la misma key para no perder el lote.
                 mount_uploader()
 
-            if too_many:
-                ui.alert(
-                    "Máximo 5 archivos",
-                    description="Quitá algunos con la X o Quitar todos.",
-                    variant="destructive",
-                    key="too_many_alert",
-                )
+            render_upload_alerts()
 
             if files:
                 render_file_rows(files, allow_remove=step == 2)
@@ -807,6 +986,9 @@ with st.container(border=True):
             finally:
                 st.session_state.processing = False
             st.rerun()
+
+if show_uploader:
+    inject_dropzone_enhancer()
 
 # Animación de funcionamiento debajo de la herramienta (solo en paso 1).
 if step == 1:

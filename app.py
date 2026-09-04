@@ -72,8 +72,8 @@ a[href*="share.streamlit.io"],
 
 .block-container {
   max-width: 1040px;
-  padding-top: 28px;
-  padding-bottom: 20px;
+  padding-top: 18px;
+  padding-bottom: 16px;
   animation: enter 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -90,63 +90,48 @@ a[href*="share.streamlit.io"],
 .hero {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin: 0 0 0.35rem 0;
-  min-height: 6.5rem;
+  gap: 10px;
+  margin: 0 0 0.7rem 0;
   overflow: visible;
+}
+
+.hero-copy {
+  min-width: 0;
+  flex: 1;
+  max-width: 38rem;
 }
 
 h1, .hero-title {
   font-family: "Outfit", sans-serif !important;
   font-weight: 650 !important;
-  font-size: clamp(2rem, 3.8vw, 2.75rem) !important;
+  font-size: clamp(1.75rem, 3.2vw, 2.25rem) !important;
   line-height: 1.1 !important;
   letter-spacing: -0.03em !important;
   color: #0C2644 !important;
-  margin: 0 !important;
+  margin: 0 0 0.2rem 0 !important;
   position: relative;
   z-index: 1;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9),
-    0 6px 18px rgba(12, 38, 68, 0.12);
 }
 
 .hero-mark {
   flex-shrink: 0;
   display: block;
-  width: clamp(7rem, 18vw, 10.5rem);
+  width: clamp(3.4rem, 8vw, 4.6rem);
   height: auto;
-  opacity: 0.34;
+  margin-top: 0.1rem;
+  opacity: 0.32;
   pointer-events: none;
   user-select: none;
-  transform-origin: center center;
   filter: brightness(0) saturate(100%) invert(16%) sepia(24%) saturate(1400%) hue-rotate(178deg);
-  animation: heroCompress 2.8s ease-in-out infinite;
-}
-
-@keyframes heroCompress {
-  0%, 100% {
-    opacity: 0.28;
-    transform: translate(4px, 2px) scale(1) scaleY(1);
-  }
-  45% {
-    opacity: 0.42;
-    transform: translate(4px, 2px) scale(0.96) scaleY(0.88);
-  }
-  55% {
-    opacity: 0.42;
-    transform: translate(4px, 2px) scale(0.96) scaleY(0.88);
-  }
 }
 
 .welcome {
   color: #2C3D4F;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  max-width: 46rem;
-  margin: 0 0 1.1rem 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  margin: 0;
   font-family: "Outfit", sans-serif;
   position: relative;
   z-index: 1;
@@ -165,7 +150,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
   animation: stepIn 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-#paso-actual { padding: 6px 4px 2px; }
+#paso-actual { padding: 2px 4px 0; }
 
 .wizard-top {
   display: flex;
@@ -325,41 +310,104 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 
 [data-testid="stFileUploaderDropzone"] {
   position: relative !important;
-  min-height: 168px !important;
+  min-height: 156px !important;
   cursor: pointer;
   background: #F7FAFC !important;
   border: 1.5px dashed #A8B8C8 !important;
-  border-radius: 10px !important;
+  border-radius: 12px !important;
   transition:
-    border-color 160ms ease,
-    background 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
-[data-testid="stFileUploaderDropzone"] > * { opacity: 0 !important; }
+[data-testid="stFileUploaderDropzone"] > *:not(.drop-ui) { opacity: 0 !important; }
 
-[data-testid="stFileUploaderDropzone"]::after {
-  content: "Arrastrá archivos acá o hacé clic";
+[data-testid="stFileUploaderDropzone"]::after { content: none !important; }
+
+.drop-ui {
   position: absolute;
   inset: 0;
+  z-index: 2;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 18px;
-  color: #1A4A6E;
-  font-family: "Outfit", sans-serif;
-  font-size: 1.05rem;
-  font-weight: 550;
-  letter-spacing: -0.01em;
+  gap: 6px;
+  padding: 14px 16px;
   pointer-events: none;
   text-align: center;
-  transition: color 160ms ease, font-size 160ms ease, opacity 160ms ease;
+  font-family: "Outfit", "Helvetica Neue", sans-serif;
 }
+
+.drop-files {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  transition: transform 180ms ease;
+}
+
+.drop-file {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 42px;
+  border-radius: 4px 8px 4px 4px;
+  color: #FFFFFF;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 2px 3px 0 rgba(12, 38, 68, 0.08);
+  transition: transform 180ms ease;
+}
+
+.drop-file.pdf { background: #C45C4A; transform: rotate(-8deg); }
+.drop-file.jpg { background: #D4A017; transform: rotate(2deg) translateY(-2px); }
+.drop-file.png { background: #3A7CA5; transform: rotate(8deg); }
+
+.drop-title {
+  margin: 0;
+  color: #0C2644;
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.drop-sub {
+  margin: 0;
+  color: #5A6B7A;
+  font-size: 0.84rem;
+  line-height: 1.3;
+}
+
+.drop-sub span {
+  color: #1A4A6E;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.drop-types {
+  margin: 4px 0 0 0;
+  color: #7A8794;
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.drop-ui .drop-drag { display: none; }
 
 [data-testid="stFileUploaderDropzone"]:hover {
   border-color: #1A4A6E !important;
   background: #F0F4F8 !important;
+}
+
+[data-testid="stFileUploaderDropzone"]:hover .drop-files {
+  transform: translateY(-2px);
 }
 
 body.compresor-dragging [data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stFileUploaderDropzone"]) {
@@ -372,9 +420,9 @@ body.compresor-dragging [data-testid="stVerticalBlockBorderWrapper"]:has([data-t
   inset: 0;
   z-index: 25;
   border-radius: 10px;
-  background: rgba(244, 246, 248, 0.55);
-  backdrop-filter: blur(7px);
-  -webkit-backdrop-filter: blur(7px);
+  background: rgba(244, 246, 248, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   pointer-events: none;
 }
 
@@ -382,22 +430,26 @@ body.compresor-dragging [data-testid="stFileUploader"] > section,
 body.compresor-dragging [data-testid="stFileUploaderDropzone"] {
   height: 100% !important;
   min-height: 100% !important;
-  border-radius: 10px !important;
-  border: 2px dashed #1A4A6E !important;
-  background: rgba(255, 255, 255, 0.42) !important;
+  border-radius: 12px !important;
+  border: 2px solid #1A4A6E !important;
+  background: rgba(240, 248, 246, 0.92) !important;
   box-shadow:
-    inset 0 0 0 1px rgba(26, 74, 110, 0.1),
+    inset 0 0 0 1px rgba(26, 74, 110, 0.08),
     0 12px 40px rgba(12, 38, 68, 0.08);
 }
 
-body.compresor-dragging [data-testid="stFileUploaderDropzone"]::after {
-  content: "Soltá el archivo acá";
-  font-size: clamp(1.45rem, 3.2vw, 2rem);
-  font-weight: 650;
+body.compresor-dragging .drop-ui .drop-idle { display: none; }
+body.compresor-dragging .drop-ui .drop-drag { display: block; }
+body.compresor-dragging .drop-ui .drop-title.drop-drag {
   color: #0C2644;
-  letter-spacing: -0.03em;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
 }
+body.compresor-dragging .drop-files {
+  transform: scale(1.08);
+}
+body.compresor-dragging .drop-file.pdf { transform: rotate(-12deg) translateY(-4px); }
+body.compresor-dragging .drop-file.jpg { transform: rotate(0deg) translateY(-8px); }
+body.compresor-dragging .drop-file.png { transform: rotate(12deg) translateY(-4px); }
 
 [data-testid="stFileUploaderFile"],
 [data-testid="stFileUploaderFileName"],
@@ -546,12 +598,9 @@ div.stButton > button[kind="secondary"] {
 @media (prefers-reduced-motion: reduce) {
   .block-container,
   div[data-testid="stVerticalBlockBorderWrapper"],
-  .file-chip,
-  .hero-mark { animation: none; }
-  .hero-mark {
-    opacity: 0.34;
-    transform: translate(4px, 2px);
-  }
+  .file-chip { animation: none; }
+  .drop-file,
+  .drop-files { transition: none; }
   div.stButton > button:hover,
   div.stDownloadButton > button:hover { transform: none; }
   body.compresor-dragging [data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stFileUploaderDropzone"])::before {
@@ -658,14 +707,42 @@ def render_upload_alerts() -> None:
 
 
 def inject_dropzone_enhancer() -> None:
-    """Detecta drag de archivos y agranda la zona de soltado a todo el componente."""
+    """Pinta la UI de carga (estilo drag&drop) y detecta arrastre de archivos."""
     components.html(
         """
 <script>
 (function () {
   const doc = window.parent.document;
+
+  const paintDropUi = () => {
+    doc.querySelectorAll('[data-testid="stFileUploaderDropzone"]').forEach((dz) => {
+      if (dz.querySelector(".drop-ui")) return;
+      const ui = doc.createElement("div");
+      ui.className = "drop-ui";
+      ui.setAttribute("aria-hidden", "true");
+      ui.innerHTML =
+        '<div class="drop-files">' +
+          '<span class="drop-file pdf">PDF</span>' +
+          '<span class="drop-file jpg">JPG</span>' +
+          '<span class="drop-file png">PNG</span>' +
+        "</div>" +
+        '<p class="drop-title drop-idle">Arrastrá y soltá</p>' +
+        '<p class="drop-title drop-drag">Soltá acá</p>' +
+        '<p class="drop-sub drop-idle">o <span>hacé clic</span> para elegir</p>' +
+        '<p class="drop-types drop-idle">PDF e imágenes · hasta 5 archivos</p>';
+      dz.appendChild(ui);
+    });
+  };
+
+  paintDropUi();
+  window.parent.setTimeout(paintDropUi, 80);
+  window.parent.setTimeout(paintDropUi, 250);
+
   if (doc.documentElement.dataset.compresorDropbound === "1") return;
   doc.documentElement.dataset.compresorDropbound = "1";
+
+  const mo = new MutationObserver(() => paintDropUi());
+  mo.observe(doc.body, { childList: true, subtree: true });
 
   let depth = 0;
 
@@ -860,22 +937,19 @@ if COMPRESS_MARK.exists():
 st.html(
     f"""
     <div class="hero">
-      <h1 class="hero-title">Compresor de archivos</h1>
+      <div class="hero-copy">
+        <h1 class="hero-title">Compresor de archivos</h1>
+        <div class="welcome">
+          <p>
+            Las plataformas municipales rechazan archivos de más de 1 MB.
+            Subí hasta 5, comprimilos acá y descargá el resultado para el trámite.
+            Todo corre en la red interna: el archivo no sale de los servidores ni se guarda.
+          </p>
+        </div>
+      </div>
       {'<img class="hero-mark" src="' + _mark_src + '" alt="" aria-hidden="true">' if _mark_src else ""}
     </div>
     """
-)
-st.markdown(
-    """
-    <div class="welcome">
-      <p>
-        Las plataformas municipales rechazan archivos de más de 1 MB.
-        Subí hasta 5, comprimilos acá y descargá el resultado para el trámite.
-        Todo corre en la red interna: el archivo no sale de los servidores ni se guarda.
-      </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
 )
 
 if "managed" not in st.session_state:

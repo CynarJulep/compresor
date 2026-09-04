@@ -33,7 +33,7 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24..48,200..700,0..1,-50..200&family=Outfit:wght@400;500;600;700&display=swap');
 
 .stApp {
   background: #F4F6F8;
@@ -86,6 +86,17 @@ a[href*="share.streamlit.io"],
   to { opacity: 1; transform: none; }
 }
 
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 0.35rem 0;
+  min-height: 4.5rem;
+  overflow: hidden;
+}
+
 h1, .hero-title {
   font-family: "Outfit", sans-serif !important;
   font-weight: 650 !important;
@@ -93,10 +104,34 @@ h1, .hero-title {
   line-height: 1.1 !important;
   letter-spacing: -0.03em !important;
   color: #0C2644 !important;
-  margin: 0 0 0.45rem 0 !important;
+  margin: 0 !important;
+  position: relative;
+  z-index: 1;
   text-shadow:
     0 1px 0 rgba(255, 255, 255, 0.9),
     0 6px 18px rgba(12, 38, 68, 0.12);
+}
+
+.hero-mark {
+  flex-shrink: 0;
+  display: inline-block;
+  font-family: "Material Symbols Rounded" !important;
+  font-weight: 300 !important;
+  font-style: normal !important;
+  font-size: clamp(4.8rem, 14vw, 7.2rem) !important;
+  line-height: 1 !important;
+  color: #1A4A6E;
+  opacity: 0.14;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  white-space: nowrap;
+  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 48;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  pointer-events: none;
+  user-select: none;
+  transform: translate(6px, 2px);
 }
 
 .welcome {
@@ -106,6 +141,8 @@ h1, .hero-title {
   max-width: 46rem;
   margin: 0 0 1.1rem 0;
   font-family: "Outfit", sans-serif;
+  position: relative;
+  z-index: 1;
 }
 
 .welcome p { margin: 0; }
@@ -802,7 +839,14 @@ def render_file_rows(files: list[HeldFile], *, allow_remove: bool) -> None:
 
 
 # --- Hero compacto ---
-st.markdown('<h1 class="hero-title">Compresor de archivos</h1>', unsafe_allow_html=True)
+st.html(
+    """
+    <div class="hero">
+      <h1 class="hero-title">Compresor de archivos</h1>
+      <span class="hero-mark material-symbols-rounded" aria-hidden="true">folder_zip</span>
+    </div>
+    """
+)
 st.markdown(
     """
     <div class="welcome">

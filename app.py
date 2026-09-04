@@ -149,25 +149,26 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 .wizard-kicker {
   margin: 0;
   color: #1A4A6E;
-  font-size: 0.72rem;
-  font-weight: 500;
+  font-size: 0.92rem;
+  font-weight: 600;
   font-family: "Outfit", sans-serif;
 }
 
 .wizard-title {
-  margin: 2px 0 0 0;
+  margin: 4px 0 0 0;
   color: #0C2644;
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.45rem;
+  font-weight: 650;
   font-family: "Outfit", sans-serif;
   letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .wizard-help {
-  margin: 4px 0 0 0;
+  margin: 6px 0 0 0;
   color: #5A6B7A;
-  font-size: 0.82rem;
-  line-height: 1.35;
+  font-size: 0.92rem;
+  line-height: 1.4;
   font-family: "Outfit", sans-serif;
 }
 
@@ -602,9 +603,6 @@ elif has_result:
 else:
     step = 2
 
-if step == 1:
-    render_explainer()
-
 UPLOAD_TYPES = ["pdf", "jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "gif", "heic", "heif"]
 show_uploader = step < 3 and len(files) < MAX_FILES
 
@@ -773,6 +771,10 @@ with st.container(border=True):
             finally:
                 st.session_state.processing = False
             st.rerun()
+
+# Animación de funcionamiento debajo de la herramienta (solo en paso 1).
+if step == 1:
+    render_explainer()
 
 st.markdown(
     """

@@ -19,7 +19,7 @@ _HTML = """
   --err: #9F2F2D;
   --ok: #2F6B5C;
   --navy: #1A4A6E;
-  margin: 0 0 0.35rem 0;
+  margin: 1.25rem 0 0.25rem 0;
   padding: 10px 14px 10px;
   background: #FFFFFF;
   border: 1px solid #D5DEE8;

@@ -19,26 +19,14 @@ _HTML = """
   --err: #9F2F2D;
   --ok: #2F6B5C;
   --navy: #1A4A6E;
-  margin: 1.25rem 0 0.25rem 0;
-  padding: 10px 14px 10px;
-  background: #FFFFFF;
-  border: 1px solid #D5DEE8;
-  border-radius: 10px;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.8) inset,
-    0 6px 16px rgba(12, 38, 68, 0.06);
+  margin: 0;
+  padding: 4px 6px 6px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   font-family: "Outfit", "Helvetica Neue", sans-serif;
   overflow: visible;
-}
-.exp-kicker {
-  margin: 2px 0 0 4px;
-  color: var(--ink);
-  font-family: "Caveat", cursive;
-  font-weight: 700;
-  font-size: clamp(1.55rem, 3vw, 1.9rem);
-  line-height: 1.1;
-  transform: rotate(-2deg);
-  transform-origin: left center;
 }
 .exp-stage {
   position: relative;
@@ -377,7 +365,6 @@ _HTML = """
   </filter>
 </svg>
 <div class="exp" role="img" aria-label="Si los archivos pesan mucho, subilos acá. El sistema los comprime y te los devuelve en un peso muy bajo, listos para el SAC.">
-  <p class="exp-kicker">¿Para qué sirve este compresor?</p>
   <div class="exp-stage">
     <p class="exp-cap exp-cap-err">¿Tus archivos pesan mucho?</p>
     <p class="exp-stamp">ERROR</p>

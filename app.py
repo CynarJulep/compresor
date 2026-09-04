@@ -391,24 +391,60 @@ div.stButton > button[kind="secondary"] {
   object-fit: contain;
 }
 
-.legal {
+.footer-bar {
   margin-top: 28px;
   padding-top: 12px;
   border-top: 1px solid #E2E8F0;
-  color: #7A8794;
-  font-size: 0.68rem;
-  line-height: 1.55;
-  max-width: 42rem;
-  font-family: "Outfit", sans-serif;
 }
 
-.copy, .renzo {
+[data-testid="stHorizontalBlock"]:has(.footer-credits) {
+  align-items: center;
+  margin-top: 0;
+}
+
+.footer-credits {
+  text-align: right;
   font-family: "Outfit", sans-serif;
   font-size: 0.66rem;
+  line-height: 1.45;
+  color: #9AA5B1;
 }
 
-.copy { margin-top: 8px; color: #9AA5B1; }
-.renzo { margin-top: 2px; color: #8A96A3; }
+.footer-credits .renzo {
+  margin-top: 2px;
+  color: #8A96A3;
+}
+
+[data-testid="stExpander"] {
+  margin-top: 1rem;
+  border: 1px solid #D5DEE8 !important;
+  border-radius: 8px !important;
+  background: #FFFFFF;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 4px 12px rgba(12, 38, 68, 0.05);
+}
+
+[data-testid="stExpander"] details {
+  border: none !important;
+}
+
+[data-testid="stExpander"] summary {
+  font-family: "Outfit", sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  color: #1A4A6E !important;
+  padding: 0.65rem 0.85rem !important;
+}
+
+[data-testid="stExpander"] summary:hover {
+  color: #0C2644 !important;
+}
+
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+  padding: 0.25rem 0.5rem 0.65rem !important;
+  border-top: 1px solid #E8EEF3;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .block-container,
@@ -774,19 +810,21 @@ with st.container(border=True):
 
 # Animación de funcionamiento debajo de la herramienta (solo en paso 1).
 if step == 1:
-    render_explainer()
+    with st.expander("¿Para qué sirve este compresor?", expanded=False):
+        render_explainer()
 
-st.markdown(
-    """
-    <div class="legal">
-      Compresor de <strong>Atención Ciudadana</strong>. Procesamiento temporal, sin almacenamiento
-      persistente. Hasta 5 archivos se pueden unir en un PDF. La calidad puede bajarse para
-      respetar 1&nbsp;MB.
-    </div>
-    <p class="copy">© 2026 Atención Ciudadana de la Municipalidad de Santa Fe. Todos los derechos reservados.</p>
-    <p class="renzo">Desarrollado y mantenido por Renzo.</p>
-    """,
-    unsafe_allow_html=True,
-)
-if LOGO.exists():
-    st.image(str(LOGO), width=160)
+st.markdown('<div class="footer-bar"></div>', unsafe_allow_html=True)
+foot_logo, foot_copy = st.columns((1, 2), vertical_alignment="center")
+with foot_logo:
+    if LOGO.exists():
+        st.image(str(LOGO), width=160)
+with foot_copy:
+    st.markdown(
+        """
+        <div class="footer-credits">
+          <div>© 2026 Atención Ciudadana de la Municipalidad de Santa Fe. Todos los derechos reservados.</div>
+          <div class="renzo">Desarrollado y mantenido por Renzo.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
